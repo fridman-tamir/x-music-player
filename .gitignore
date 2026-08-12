@@ -107,7 +107,7 @@ dist
 .docs/
 
 #Xpell Public
-public/
+# public/
 
 #Aplle OSX files
 .DS_Store
