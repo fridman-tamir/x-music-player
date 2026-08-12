@@ -1,6 +1,9 @@
 services:
   reut-music-player:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
+
     container_name: reut-music-player
     restart: unless-stopped
 
@@ -12,3 +15,9 @@ services:
 
     environment:
       YTDLP_PATH: /home/pi/.local/bin/yt-dlp
+
+    devices:
+      - /dev/snd:/dev/snd
+    
+    
+      

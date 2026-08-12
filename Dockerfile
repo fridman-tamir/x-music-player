@@ -7,14 +7,13 @@ RUN apt-get update \
 
 RUN corepack enable
 
-WORKDIR /app
+WORKDIR /app/server
 
-COPY . .
+COPY server/package.json ./
+COPY server/pnpm-lock.yaml* ./
 
 RUN pnpm install --frozen-lockfile
-RUN pnpm -C client build
-RUN pnpm -C server build
 
-WORKDIR /app/server
+COPY server/ ./
 
 CMD ["pnpm", "start"]
