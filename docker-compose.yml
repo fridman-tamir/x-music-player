@@ -14,7 +14,7 @@ services:
       - ./server/work:/app/server/work
 
     environment:
-      YTDLP_PATH: /home/pi/.local/bin/yt-dlp
+      YTDLP_PATH: /usr/local/bin/yt-dlp
 
     devices:
       - /dev/snd:/dev/snd
