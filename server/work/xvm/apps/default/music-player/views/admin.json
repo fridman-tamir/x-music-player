@@ -104,6 +104,80 @@
           "class": "admin-content playlist-admin-content",
           "_children": [
             {
+              "_id": "audio-output-panel",
+              "_type": "xsection",
+              "class": "panel admin-panel audio-output-panel music-admin-settings-section",
+              "_title": "Player Settings",
+              "_subtitle": "Choose the audio output used when playback starts.",
+              "_children": [
+                {
+                  "_id": "audio-output-row",
+                  "_type": "toolbar",
+                  "class": "audio-output-row",
+                  "_justify": "start",
+                  "_align": "end",
+                  "_wrap": true,
+                  "_children": [
+                    {
+                      "_id": "audio-output-field",
+                      "_type": "field",
+                      "_label": "Audio Output",
+                      "_control": {
+                        "_id": "audio-output-select",
+                        "_type": "xselect",
+                        "_placeholder": "Loading devices",
+                        "_data_source": "music-audio-devices",
+                        "_selected_data_source": "music-audio-device",
+                        "_data_output": "music-audio-device-pending",
+                        "_options": [],
+                        "_on_change": {
+                          "_module": "music-player-client",
+                          "_op": "set-audio-device",
+                          "_params": {
+                            "_audio_device": "$data"
+                          }
+                        }
+                      },
+                      "_update_data_source_event": "change"
+                    },
+                    {
+                      "_id": "audio-output-refresh-button",
+                      "_type": "button",
+                      "_text": "Refresh",
+                      "_variant": "secondary",
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "list-audio-devices",
+                          "_params": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "audio-output-status",
+                  "_type": "label",
+                  "_text": "Loading audio outputs...",
+                  "class": "admin-panel-subtitle audio-output-status",
+                  "_data_source": "music-audio-device-status",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "audio-output-error",
+                  "_type": "label",
+                  "_text": "",
+                  "class": "admin-panel-subtitle audio-output-error",
+                  "_data_source": "music-audio-device-error",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                }
+              ]
+            },
+            {
               "_id": "playlist-manager-panel",
               "_type": "xsection",
               "class": "panel admin-panel playlist-manager-panel music-admin-playlists-section",

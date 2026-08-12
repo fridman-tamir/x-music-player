@@ -677,6 +677,7 @@
 
 .playlist-manager-panel,
 .selected-playlist-panel,
+.audio-output-panel,
 .youtube-download-panel,
 .music-admin-import-section,
 .schedule-manager-panel {
@@ -687,6 +688,7 @@
 }
 
 .playlist-manager-panel.panel,
+.audio-output-panel.panel,
 .youtube-download-panel.panel,
 .music-admin-import-section.panel,
 .schedule-manager-panel.panel {
@@ -698,6 +700,7 @@
 }
 
 .playlist-manager-panel .xsection__container,
+.audio-output-panel .xsection__container,
 .playlist-master-pane .xsection__container,
 .playlist-detail-pane .xsection__container,
 .youtube-download-panel .xsection__container,
@@ -712,6 +715,7 @@
 }
 
 .playlist-manager-panel > .xsection__container,
+.audio-output-panel > .xsection__container,
 .youtube-download-panel > .xsection__container,
 .schedule-manager-panel > .xsection__container {
   padding: 18px;
@@ -737,6 +741,7 @@
 
 .playlist-master-pane,
 .playlist-detail-pane,
+.audio-output-panel,
 .youtube-import-card,
 .schedule-create-pane,
 .schedule-list-pane {
@@ -757,6 +762,34 @@
 .youtube-import-card {
   width: min(860px, 100%);
   max-width: 100%;
+}
+
+.audio-output-row {
+  gap: 10px;
+}
+
+.audio-output-field {
+  width: min(26rem, 100%);
+}
+
+.audio-output-field .xfield__control,
+.audio-output-field select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.audio-output-refresh-button {
+  white-space: nowrap;
+}
+
+.audio-output-status {
+  margin: 8px 0 0;
+}
+
+.audio-output-error {
+  min-height: 1.25rem;
+  margin: 2px 0 0;
+  color: #ff8a8a;
 }
 
 .playlist-gallery .xgallery__grid {

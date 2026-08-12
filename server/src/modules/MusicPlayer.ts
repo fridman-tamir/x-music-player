@@ -9,7 +9,7 @@ import {
     _xlog
 } from "@xpell/node";
 
-import { spawn, type ChildProcess, type ChildProcessWithoutNullStreams } from "child_process";
+import { execFile, spawn, type ChildProcess, type ChildProcessWithoutNullStreams } from "child_process";
 import fs from "fs";
 import net from "net";
 import os from "os";
@@ -24,6 +24,7 @@ const PLAYLIST_ENTITY_ID = "playlist";
 const PLAYLIST_ITEM_ENTITY_ID = "playlist_item";
 const PLAYLIST_SCHEDULE_ENTITY_ID = "playlist_schedule";
 const DEFAULT_VOLUME = 45;
+const DEFAULT_AUDIO_DEVICE_ID = "auto";
 const SUPPORTED_AUDIO_EXTS = new Set([".mp3", ".wav", ".ogg", ".m4a"]);
 
 type NormalizedTrack = {
@@ -37,6 +38,15 @@ type NormalizedTrack = {
 type MpvCommandOptions = {
     retry?: boolean;
     allowed_errors?: string[];
+};
+
+type AudioDevice = {
+    _id: string;
+    _label: string;
+};
+
+type MusicPlayerConfig = {
+    _audio_device: string;
 };
 
 type PlaylistPlaybackItem = {
@@ -80,6 +90,24 @@ export class MusicPlayer extends XModule {
             _name: "list-tracks",
             _scope: "module",
             _description: "List persisted audio tracks from XDB."
+        },
+        "list-audio-devices": {
+            _name: "list-audio-devices",
+            _scope: "module",
+            _description: "List audio output devices currently visible to mpv."
+        },
+        "get-audio-device": {
+            _name: "get-audio-device",
+            _scope: "module",
+            _description: "Get the selected mpv audio output device."
+        },
+        "set-audio-device": {
+            _name: "set-audio-device",
+            _scope: "module",
+            _description: "Set and persist the selected mpv audio output device.",
+            _params: {
+                _audio_device: "Required mpv audio device id from list-audio-devices."
+            }
         },
         "create-playlist": {
             _name: "create-playlist",
@@ -231,6 +259,9 @@ export class MusicPlayer extends XModule {
 
     _work_folder: string;
     _music_folder: string = "";
+    private _config_folder: string;
+    private _config_file_path: string;
+    private _audio_device = DEFAULT_AUDIO_DEVICE_ID;
     private _player_process?: ChildProcessWithoutNullStreams | ChildProcess;
     private _mpv_socket_path?: string;
     private _mpv_event_socket?: net.Socket;
@@ -261,11 +292,14 @@ export class MusicPlayer extends XModule {
         super({ _name: MusicPlayer._name });
         this._work_folder = work_folder || "work";
         this._music_folder = path.join(this._work_folder, "music");
+        this._config_folder = path.join(this._work_folder, "config");
+        this._config_file_path = path.join(this._config_folder, "music-player.json");
         _xlog.log("[music-player] initialized with work folder:", this._work_folder, "music folder:", this._music_folder);
     }
 
     async onLoad() {
-        xu.checkFolders([this._work_folder, this._music_folder])
+        xu.checkFolders([this._work_folder, this._music_folder, this._config_folder]);
+        this._audio_device = this.loadAudioDeviceConfig();
     }
 
     async onFrame(frameNumber: number) {
@@ -323,6 +357,180 @@ export class MusicPlayer extends XModule {
         }
 
         return [];
+    }
+
+    private loadAudioDeviceConfig() {
+        if (!fs.existsSync(this._config_file_path)) {
+            return DEFAULT_AUDIO_DEVICE_ID;
+        }
+
+        try {
+            const raw = fs.readFileSync(this._config_file_path, "utf8");
+            const parsed = JSON.parse(raw) as Partial<MusicPlayerConfig>;
+            const audio_device = typeof parsed?._audio_device === "string"
+                ? parsed._audio_device.trim()
+                : "";
+
+            if (!audio_device) {
+                _xlog.error("[music-player] malformed audio device config, using auto:", this._config_file_path);
+                return DEFAULT_AUDIO_DEVICE_ID;
+            }
+
+            _xlog.log("[music-player] audio device config loaded:", audio_device);
+            return audio_device;
+        } catch (err: any) {
+            _xlog.error("[music-player] audio device config load failed, using auto:", {
+                _config_file_path: this._config_file_path,
+                _message: err?.message ?? String(err)
+            });
+
+            return DEFAULT_AUDIO_DEVICE_ID;
+        }
+    }
+
+    private saveAudioDeviceConfig(audio_device: string) {
+        const config: MusicPlayerConfig = {
+            _audio_device: audio_device || DEFAULT_AUDIO_DEVICE_ID
+        };
+
+        fs.mkdirSync(this._config_folder, { recursive: true });
+        fs.writeFileSync(this._config_file_path, `${JSON.stringify(config, null, 2)}\n`, "utf8");
+    }
+
+    private execMpvAudioDeviceHelp() {
+        return new Promise<string>((resolve, reject) => {
+            execFile(
+                "mpv",
+                ["--audio-device=help"],
+                {
+                    maxBuffer: 1024 * 1024,
+                    timeout: 5000
+                },
+                (err, stdout, stderr) => {
+                    const output = `${stdout ?? ""}\n${stderr ?? ""}`.trim();
+
+                    if (err) {
+                        reject(new Error(`mpv audio device discovery failed: ${err.message}${output ? `: ${output}` : ""}`));
+                        return;
+                    }
+
+                    resolve(output);
+                }
+            );
+        });
+    }
+
+    private improveAudioDeviceLabel(id: string, label: string) {
+        const cleaned_label = label
+            .replace(/\s+/g, " ")
+            .trim();
+
+        if (id === DEFAULT_AUDIO_DEVICE_ID) {
+            return "Auto";
+        }
+
+        if (cleaned_label) {
+            return cleaned_label;
+        }
+
+        const id_tail = id.includes("/")
+            ? id.slice(id.indexOf("/") + 1)
+            : id;
+        const card_match = id_tail.match(/CARD=([^,]+)/);
+        const device_match = id_tail.match(/DEV=([^,]+)/);
+
+        if (card_match?.[1] && device_match?.[1]) {
+            return `${card_match[1]} ${device_match[1]}`.replace(/[_-]+/g, " ");
+        }
+
+        if (card_match?.[1]) {
+            return card_match[1].replace(/[_-]+/g, " ");
+        }
+
+        return id_tail.replace(/^default:/, "").replace(/[_-]+/g, " ");
+    }
+
+    private parseMpvAudioDeviceLine(line: string): AudioDevice | null {
+        const trimmed = line.trim();
+
+        if (!trimmed) {
+            return null;
+        }
+
+        const quoted_match = trimmed.match(/["']([^"']+)["']\s*(?:\(([^)]*)\))?/);
+
+        if (quoted_match?.[1]) {
+            const id = quoted_match[1].trim();
+
+            if (!id) {
+                return null;
+            }
+
+            return {
+                _id: id,
+                _label: this.improveAudioDeviceLabel(id, quoted_match[2] ?? "")
+            };
+        }
+
+        const plain_match = trimmed.match(/^([^\s()]+)\s*(?:\(([^)]*)\))?$/);
+
+        if (!plain_match?.[1]) {
+            return null;
+        }
+
+        const id = plain_match[1].trim();
+
+        if (!id || id.endsWith(":")) {
+            return null;
+        }
+
+        return {
+            _id: id,
+            _label: this.improveAudioDeviceLabel(id, plain_match[2] ?? "")
+        };
+    }
+
+    private parseMpvAudioDevices(output: string) {
+        const devices: AudioDevice[] = [
+            {
+                _id: DEFAULT_AUDIO_DEVICE_ID,
+                _label: "Auto"
+            }
+        ];
+        const seen = new Set(devices.map((device) => device._id));
+
+        for (const line of output.split(/\r?\n|\r/g)) {
+            const device = this.parseMpvAudioDeviceLine(line);
+
+            if (!device || seen.has(device._id)) {
+                continue;
+            }
+
+            devices.push(device);
+            seen.add(device._id);
+        }
+
+        return devices;
+    }
+
+    private async discoverAudioDevices() {
+        const output = await this.execMpvAudioDeviceHelp();
+        const devices = this.parseMpvAudioDevices(output);
+
+        _xlog.log("[music-player] audio devices discovered:", devices.length);
+
+        return devices;
+    }
+
+    private buildMpvArgs(socket_path: string) {
+        const audio_device = this._audio_device || DEFAULT_AUDIO_DEVICE_ID;
+
+        return [
+            "--idle=yes",
+            "--no-video",
+            `--input-ipc-server=${socket_path}`,
+            `--audio-device=${audio_device}`
+        ];
     }
 
     private async findAudioTrackByPath(file_path: string) {
@@ -793,11 +1001,7 @@ export class MusicPlayer extends XModule {
 
         this.removeMpvSocketFile(socket_path);
 
-        const args = [
-            "--idle=yes",
-            "--no-video",
-            `--input-ipc-server=${socket_path}`
-        ];
+        const args = this.buildMpvArgs(socket_path);
         const player_process = spawn("mpv", args);
 
         this._player_process = player_process;
@@ -1706,6 +1910,102 @@ export class MusicPlayer extends XModule {
                 _ok: false,
                 _message: `List tracks failed: ${err?.message ?? String(err)}`,
                 _tracks: []
+            }).toXData();
+        }
+    }
+
+    async _list_audio_devices(xcmd: XCommand) {
+        try {
+            const devices = await this.discoverAudioDevices();
+
+            return new XResponseOK({
+                _devices: devices,
+                _selected: this._audio_device || DEFAULT_AUDIO_DEVICE_ID
+            }).toXData();
+        } catch (err: any) {
+            const message = err?.message ?? String(err);
+
+            _xlog.error("[music-player] list audio devices failed:", message);
+
+            return new XResponseOK({
+                _ok: false,
+                _code: "E_AUDIO_DEVICE_DISCOVERY_FAILED",
+                _message: `List audio devices failed: ${message}`,
+                _devices: [
+                    {
+                        _id: DEFAULT_AUDIO_DEVICE_ID,
+                        _label: "Auto"
+                    }
+                ],
+                _selected: this._audio_device || DEFAULT_AUDIO_DEVICE_ID
+            }).toXData();
+        }
+    }
+
+    async _get_audio_device(xcmd: XCommand) {
+        return new XResponseOK({
+            _audio_device: this._audio_device || DEFAULT_AUDIO_DEVICE_ID,
+            _selected: this._audio_device || DEFAULT_AUDIO_DEVICE_ID
+        }).toXData();
+    }
+
+    async _set_audio_device(xcmd: XCommand) {
+        try {
+            const params = this.readParams(xcmd);
+            const requested_audio_device = (
+                this.readRequiredString(params, "_audio_device") ||
+                this.readRequiredString(params, "_id")
+            );
+
+            if (!requested_audio_device) {
+                return this.fail("Audio device is required.");
+            }
+
+            const devices = await this.discoverAudioDevices();
+            const selected_device = devices.find((device) => device._id === requested_audio_device);
+
+            if (!selected_device) {
+                return new XResponseOK({
+                    _ok: false,
+                    _code: "E_AUDIO_DEVICE_NOT_AVAILABLE",
+                    _message: "Audio device is not available to mpv.",
+                    _audio_device: this._audio_device || DEFAULT_AUDIO_DEVICE_ID,
+                    _requested: requested_audio_device,
+                    _devices: devices
+                }).toXData();
+            }
+
+            const previous_audio_device = this._audio_device || DEFAULT_AUDIO_DEVICE_ID;
+            const had_player_process = Boolean(this._player_process);
+            this._audio_device = selected_device._id;
+            this.saveAudioDeviceConfig(this._audio_device);
+
+            if (had_player_process) {
+                await this.restartPlayer("audio device changed");
+            }
+
+            _xlog.log("[music-player] audio device selected:", {
+                _previous: previous_audio_device,
+                _selected: this._audio_device
+            });
+
+            return new XResponseOK({
+                _message: "Audio device selected.",
+                _audio_device: this._audio_device,
+                _selected: this._audio_device,
+                _device: selected_device,
+                _restarted: had_player_process
+            }).toXData();
+        } catch (err: any) {
+            const message = err?.message ?? String(err);
+
+            _xlog.error("[music-player] set audio device failed:", message);
+
+            return new XResponseOK({
+                _ok: false,
+                _code: "E_AUDIO_DEVICE_SET_FAILED",
+                _message: `Set audio device failed: ${message}`,
+                _audio_device: this._audio_device || DEFAULT_AUDIO_DEVICE_ID
             }).toXData();
         }
     }

@@ -5,7 +5,7 @@ import "dotenv/config";
 
 import { XTestModule } from "./modules/Test/XTest.js";
 
-import {MusicPlayer} from "./modules/Test/MusicPlayer.js"
+import {MusicPlayer} from "./modules/MusicPlayer.js"
 import { YouTubeDownloaderModule } from "./modules/YouTubeDownloader/YouTubeDownloaderModule.js";
 
 function is_plain_object(value: unknown): value is Record<string, unknown> {

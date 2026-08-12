@@ -14,6 +14,8 @@ services:
       - ./server/work:/app/server/work
 
     environment:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
       YTDLP_PATH: /usr/local/bin/yt-dlp
 
     devices:

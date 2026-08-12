@@ -69,6 +69,21 @@ export class MusicPlayerClient extends XModule {
             _scope: "module",
             _description: "Initialize admin playlists, schedules, and selected playlist details."
         },
+        "list-audio-devices": {
+            _name: "list-audio-devices",
+            _scope: "module",
+            _description: "Load mpv-visible audio output devices from the server into XData."
+        },
+        "get-audio-device": {
+            _name: "get-audio-device",
+            _scope: "module",
+            _description: "Load the currently selected server audio output device into XData."
+        },
+        "set-audio-device": {
+            _name: "set-audio-device",
+            _scope: "module",
+            _description: "Set the selected server audio output device and update XData after success."
+        },
         "create-playlist": {
             _name: "create-playlist",
             _scope: "module",
@@ -298,6 +313,120 @@ export class MusicPlayerClient extends XModule {
         }
 
         return [];
+    }
+
+    private readAudioDevicesFromResult(result: any) {
+        const candidates = [
+            result?._devices,
+            result?._result?._devices,
+            result?._data?._devices,
+            result?._result?._data?._devices
+        ];
+
+        for (const candidate of candidates) {
+            if (Array.isArray(candidate)) {
+                return candidate;
+            }
+        }
+
+        return [];
+    }
+
+    private readAudioDeviceSelectionFromResult(result: any) {
+        const candidates = [
+            result?._selected,
+            result?._audio_device,
+            result?._result?._selected,
+            result?._result?._audio_device,
+            result?._data?._selected,
+            result?._data?._audio_device,
+            result?._result?._data?._selected,
+            result?._result?._data?._audio_device
+        ];
+
+        for (const candidate of candidates) {
+            if (typeof candidate === "string" && candidate.trim()) {
+                return candidate.trim();
+            }
+        }
+
+        return "";
+    }
+
+    private normalizeAudioDeviceOptions(devices: any[]) {
+        return devices
+            .map((device: any) => {
+                const value = typeof device?._id === "string" ? device._id.trim() : "";
+                const label = typeof device?._label === "string" ? device._label.trim() : "";
+
+                if (!value) {
+                    return null;
+                }
+
+                return {
+                    value,
+                    label: label || (value === "auto" ? "Auto" : "Audio Output")
+                };
+            })
+            .filter(Boolean);
+    }
+
+    private findAudioDeviceLabel(audio_device: string) {
+        const options = this.readXDataArray("music-audio-devices");
+        const option = options.find((item: any) => item?.value === audio_device);
+        const label = typeof option?.label === "string" ? option.label.trim() : "";
+
+        return label || "selected output";
+    }
+
+    private syncAudioDeviceSelector(options: any[], selected: string) {
+        const selector = (XUI as any).getObject?.("audio-output-select");
+
+        if (selector?.setOptions) {
+            selector.setOptions(options, true);
+        }
+
+        if (selector?.setValue) {
+            selector.setValue(selected, true);
+        }
+    }
+
+    private storeAudioDeviceList(
+        result: any,
+        source: string,
+        options: {
+            _clear_error?: boolean;
+            _status?: string;
+        } = {}
+    ) {
+        const devices = this.readAudioDevicesFromResult(result);
+        const device_options = this.normalizeAudioDeviceOptions(devices);
+        const selected = (
+            this.readAudioDeviceSelectionFromResult(result) ||
+            this.readXDataString("music-audio-device") ||
+            "auto"
+        );
+
+        _xd.set("music-audio-device-result", result, { source });
+        _xd.set("music-audio-devices", device_options, { source });
+        _xd.set("music-audio-device", selected, { source });
+        _xd.set("music-audio-device-pending", selected, { source });
+
+        if (options._clear_error !== false) {
+            _xd.set("music-audio-device-error", "", { source });
+        }
+
+        if (options._status) {
+            _xd.set("music-audio-device-status", options._status, { source });
+        }
+
+        this.syncAudioDeviceSelector(device_options, selected);
+
+        return {
+            _devices: devices,
+            _options: device_options,
+            _selected: selected
+        };
     }
 
     private storeTracks(tracks: any[], source: string) {
@@ -1915,10 +2044,228 @@ export class MusicPlayerClient extends XModule {
         }
     }
 
+    async _list_audio_devices(xcmd?: ClientXCommand) {
+        const source = "music-player-client.list-audio-devices";
+        const preserve_error = xcmd?._params?._preserve_audio_device_error === true;
+
+        try {
+            if (!preserve_error) {
+                _xd.set("music-audio-device-status", "Refreshing audio outputs...", { source });
+            }
+
+            const client = XUIRuntime.requireClient();
+            const result = await client.sendXcmd({
+                _module: "music-player",
+                _op: "list-audio-devices",
+                _params: {}
+            });
+
+            const stored = this.storeAudioDeviceList(result, source, {
+                _clear_error: result?._ok !== false && !preserve_error,
+                _status: result?._ok === false
+                    ? this.getResultMessage(result, "Audio output discovery failed.")
+                    : preserve_error
+                        ? undefined
+                    : `Loaded ${this.readAudioDevicesFromResult(result).length} audio outputs.`
+            });
+
+            if (result?._ok === false) {
+                const message = this.getResultMessage(result, "Audio output discovery failed.");
+
+                _xlog.error("[music-player-client] audio devices error received:", message);
+                if (!preserve_error) {
+                    _xd.set("music-audio-device-error", message, { source });
+                }
+
+                return {
+                    ...result,
+                    _devices: stored._devices,
+                    _selected: stored._selected
+                };
+            }
+
+            _xlog.log("[music-player-client] audio devices loaded:", stored._devices.length);
+
+            return {
+                ...result,
+                _devices: stored._devices,
+                _selected: stored._selected
+            };
+        } catch (err: any) {
+            const message = this.getErrorMessage(err);
+            const result = {
+                _ok: false,
+                _message: `Audio output discovery failed: ${message}`,
+                _devices: [],
+                _selected: this.readXDataString("music-audio-device") || "auto"
+            };
+
+            _xlog.error("[music-player-client] audio devices error received:", err);
+            this.storeAudioDeviceList(result, source, {
+                _clear_error: false,
+                _status: preserve_error ? undefined : result._message
+            });
+            if (!preserve_error) {
+                _xd.set("music-audio-device-error", result._message, { source });
+            }
+
+            return result;
+        }
+    }
+
+    async _get_audio_device() {
+        const source = "music-player-client.get-audio-device";
+
+        try {
+            const client = XUIRuntime.requireClient();
+            const result = await client.sendXcmd({
+                _module: "music-player",
+                _op: "get-audio-device",
+                _params: {}
+            });
+
+            const selected = this.readAudioDeviceSelectionFromResult(result) || "auto";
+
+            if (result?._ok === false) {
+                const message = this.getResultMessage(result, "Get audio output failed.");
+
+                _xd.set("music-audio-device-error", message, { source });
+                _xd.set("music-audio-device-status", message, { source });
+
+                return result;
+            }
+
+            _xd.set("music-audio-device-result", result, { source });
+            _xd.set("music-audio-device", selected, { source });
+            _xd.set("music-audio-device-pending", selected, { source });
+            _xd.set("music-audio-device-error", "", { source });
+            _xd.set("music-audio-device-status", `Current audio output: ${this.findAudioDeviceLabel(selected)}.`, { source });
+            this.syncAudioDeviceSelector(this.readXDataArray("music-audio-devices"), selected);
+
+            return {
+                ...result,
+                _selected: selected
+            };
+        } catch (err: any) {
+            const message = this.getErrorMessage(err);
+            const result = {
+                _ok: false,
+                _message: `Get audio output failed: ${message}`
+            };
+
+            _xlog.error("[music-player-client] get audio device failed:", err);
+            _xd.set("music-audio-device-error", result._message, { source });
+            _xd.set("music-audio-device-status", result._message, { source });
+
+            return result;
+        }
+    }
+
+    async _set_audio_device(xcmd?: ClientXCommand) {
+        const source = "music-player-client.set-audio-device";
+        const previous_audio_device = this.readXDataString("music-audio-device") || "auto";
+        const requested_audio_device =
+            this.readParamString(xcmd, "_audio_device") ||
+            this.readParamString(xcmd, "_id") ||
+            this.readXDataString("music-audio-device-pending") ||
+            this.readControlString("audio-output-select");
+
+        if (!requested_audio_device) {
+            const result = {
+                _ok: false,
+                _message: "Select an audio output."
+            };
+
+            _xd.set("music-audio-device-error", result._message, { source });
+            _xd.set("music-audio-device-status", result._message, { source });
+            this.setControlValue("audio-output-select", previous_audio_device);
+
+            return result;
+        }
+
+        try {
+            _xd.set("music-audio-device-error", "", { source });
+            _xd.set("music-audio-device-status", "Changing audio output...", { source });
+
+            const client = XUIRuntime.requireClient();
+            const result = await client.sendXcmd({
+                _module: "music-player",
+                _op: "set-audio-device",
+                _params: {
+                    _audio_device: requested_audio_device
+                }
+            });
+
+            if (result?._ok === false) {
+                const message = this.getResultMessage(result, "Set audio output failed.");
+                const selected = this.readAudioDeviceSelectionFromResult(result) || previous_audio_device;
+
+                if (this.readAudioDevicesFromResult(result).length > 0) {
+                    this.storeAudioDeviceList(result, source, {
+                        _clear_error: false
+                    });
+                }
+
+                _xd.set("music-audio-device-error", message, { source });
+                _xd.set("music-audio-device-status", message, { source });
+                _xd.set("music-audio-device-pending", selected, { source });
+                this.setControlValue("audio-output-select", selected);
+                await this._list_audio_devices({
+                    _params: {
+                        _preserve_audio_device_error: true
+                    }
+                });
+
+                return result;
+            }
+
+            const selected = this.readAudioDeviceSelectionFromResult(result) || requested_audio_device;
+            const device = result?._device;
+            const label = typeof device?._label === "string" && device._label.trim()
+                ? device._label.trim()
+                : this.findAudioDeviceLabel(selected);
+
+            _xd.delete("music-error", { source });
+            _xd.set("music-audio-device-result", result, { source });
+            _xd.set("music-audio-device", selected, { source });
+            _xd.set("music-audio-device-pending", selected, { source });
+            _xd.set("music-audio-device-error", "", { source });
+            _xd.set("music-audio-device-status", `Audio output changed to ${label}.`, { source });
+            this.setControlValue("audio-output-select", selected);
+
+            _xlog.log("[music-player-client] audio device selected:", selected);
+
+            return {
+                ...result,
+                _selected: selected
+            };
+        } catch (err: any) {
+            const message = this.getErrorMessage(err);
+            const result = {
+                _ok: false,
+                _message: `Set audio output failed: ${message}`
+            };
+
+            _xlog.error("[music-player-client] set audio device failed:", err);
+            _xd.set("music-audio-device-error", result._message, { source });
+            _xd.set("music-audio-device-status", result._message, { source });
+            _xd.set("music-audio-device-pending", previous_audio_device, { source });
+            this.setControlValue("audio-output-select", previous_audio_device);
+            await this._list_audio_devices({
+                _params: {
+                    _preserve_audio_device_error: true
+                }
+            });
+
+            return result;
+        }
+    }
+
     async _init_admin_view() {
         const source = "music-player-client.init-admin-view";
 
         try {
+            const audio_devices_result = await this._list_audio_devices();
             const playlists_result = await this._list_playlists();
             this.buildPlaylistOptions(source);
             const schedules_result = await this._list_schedules();
@@ -1966,9 +2313,11 @@ export class MusicPlayerClient extends XModule {
 
             return {
                 _ok: playlists_result?._ok !== false && schedules_result?._ok !== false,
+                _audio_devices_ok: audio_devices_result?._ok !== false,
                 _playlists: playlists,
                 _schedules: Array.isArray(schedules_result?._schedules) ? schedules_result._schedules : [],
                 _selected_playlist_id: playlist_id,
+                _selected_audio_device: this.readXDataString("music-audio-device"),
                 _playlist_details: playlist_details
             };
         } catch (err: any) {
