@@ -6,14 +6,15 @@ const require = createRequire(import.meta.url);
 const xpellUiRoot = dirname(require.resolve("@xpell/ui/package.json"));
 
 export default defineConfig({
+  base: "/public/",
   resolve: {
     alias: {
       "@xpell/ui/xui.css": resolve(xpellUiRoot, "dist/ui.css")
     }
   },
   build: {
-    outDir: resolve(__dirname, "dist"),
-    emptyOutDir: true,
+    outDir: resolve(__dirname, "../server/work/public"),
+    emptyOutDir: false,
     rollupOptions: {
       input: resolve(__dirname, "index.html")
     },
