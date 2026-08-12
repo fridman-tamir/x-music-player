@@ -2782,6 +2782,7 @@ export class MusicPlayerClient extends XModule {
         const source = "music-player-client.get-schedule-runtime-state";
         const suppress_transient_errors =
             xcmd?._params?._suppress_transient_errors === true;
+        const previous_active_schedule_id = this.readXDataString("music-active-schedule-id");
 
         try {
             const client = XUIRuntime.requireClient();
@@ -2805,6 +2806,11 @@ export class MusicPlayerClient extends XModule {
             }
 
             this.storeScheduleRuntimeState(result, source);
+            await this.syncPlaybackStateFromScheduleRuntime(
+                previous_active_schedule_id,
+                result,
+                source
+            );
 
             return result;
         } catch (err: any) {
@@ -2825,6 +2831,34 @@ export class MusicPlayerClient extends XModule {
 
             return result;
         }
+    }
+
+    private async syncPlaybackStateFromScheduleRuntime(
+        previous_active_schedule_id: string,
+        result: any,
+        source: string
+    ) {
+        const active_schedule_id = this.readResultString(result, "_active_schedule_id");
+        const schedule_changed = active_schedule_id !== previous_active_schedule_id;
+        const schedule_active_without_player_ui =
+            Boolean(active_schedule_id) && !this.isPollingPlaybackStatus();
+
+        if (!schedule_changed && !schedule_active_without_player_ui) {
+            return;
+        }
+
+        const player_state = await this._get_player_state({
+            _params: {
+                _suppress_transient_errors: true
+            }
+        });
+
+        if (player_state?._ok === false) {
+            return;
+        }
+
+        this.updateCurrentTrackTitleFromTracks(source);
+        this.updatePlaybackUI();
     }
 
     async _set_schedule_enabled(xcmd?: ClientXCommand) {

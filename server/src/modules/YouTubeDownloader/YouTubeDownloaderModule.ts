@@ -121,7 +121,7 @@ export class YouTubeDownloaderModule extends XModule {
         const ffmpeg_ready = await this.commandExists(this._ffmpeg_bin, ["-version"]);
 
         if (!yt_dlp_ready || !ffmpeg_ready) {
-            _xlog.warn("[youtube-downloader] missing runtime dependency", {
+            _xlog.log("[youtube-downloader] missing runtime dependency", {
                 _yt_dlp: yt_dlp_ready,
                 _ffmpeg: ffmpeg_ready,
                 _message: "Install yt-dlp and ffmpeg on PATH before using YouTube downloads."

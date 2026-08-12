@@ -1,0 +1,22 @@
+{
+  "xai": {
+    "providers": {
+      "aime": {
+        "api_key": "xair_XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+      }
+    },
+    "default_provider": "aime"
+  },
+  "xweb":{
+    "domain": "localhost",
+    "http-port": 80,
+    "enable-ssl": false,
+    "enable-wormhole": true,
+    "ssl-settings": {
+      "https-port": 3443,
+      "ssl-pk-file": "",
+      "ssl-cert-file": "",
+      "ssl-chain-file": ""
+    }
+  }
+}

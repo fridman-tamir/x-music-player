@@ -117,7 +117,7 @@ package-lock.json
 #work (.work/)
 # work/
 server/work/music
-server/work/settings
+# server/work/settings
 server/work/xdb
 server/work/cache
 server-log.txt
