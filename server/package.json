@@ -1,0 +1,25 @@
+{
+  "name": "xpell-vibe-starter-server",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "./dist/main.js",
+  "scripts": {
+    "build": "tsc -p .",
+    "test:admin-ui": "node tests/admin-create-playlist-modal.test.mjs",
+    "start": "node dist/main.js",
+    "dev": "tsc -p . && node dist/main.js"
+  },
+  "dependencies": {
+    "@xpell/node": "workspace:*",
+    "@xpell/vibe": "workspace:*",
+    "@xpell/xai-providers": "^2.0.4",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.1",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "@xpell/core": "^2.0.3"
+  }
+}
