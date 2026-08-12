@@ -1,0 +1,13 @@
+{
+  "_eligible": true,
+  "_reason": "eligible",
+  "_type": "deterministic-view-edit",
+  "_action": "hide-object",
+  "_target_id": "admin-section-nav",
+  "_resolved_by": "id",
+  "_parent_id": "admin-toolbar",
+  "_hide_mechanism": "style.display:none",
+  "_target_view_id": "admin",
+  "_source_view_id": "admin",
+  "_requested_view_id": "admin"
+}

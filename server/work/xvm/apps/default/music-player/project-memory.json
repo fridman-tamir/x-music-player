@@ -5,10 +5,17 @@
   "_goal": "",
   "_current_focus": "",
   "_completed": [],
-  "_achievements": [],
+  "_achievements": [
+    {
+      "_id": "first-suggested-action-applied",
+      "_title": "First suggested action applied",
+      "_type": "onboarding",
+      "_completed_at": "2026-08-12T18:51:26.156Z"
+    }
+  ],
   "_milestones": [],
   "_parking_lot": [],
   "_decisions": [],
   "_notes": [],
-  "_updated_at": ""
+  "_updated_at": "2026-08-12T18:51:26.157Z"
 }

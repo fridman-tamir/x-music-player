@@ -1,0 +1,15 @@
+{
+  "_artifact_type": "view",
+  "_artifact_id": "admin",
+  "_view_id": "admin",
+  "_source_view_id": "admin",
+  "_persisted_view_id": "admin",
+  "_success": true,
+  "_deterministic": true,
+  "_edit_action": "hide-object",
+  "_mutation_action": "hide-object",
+  "_mutation_target_id": "admin-section-nav",
+  "_parent_id": "admin-toolbar",
+  "_hide_mechanism": "style.display:none",
+  "_persisted_version": 48
+}

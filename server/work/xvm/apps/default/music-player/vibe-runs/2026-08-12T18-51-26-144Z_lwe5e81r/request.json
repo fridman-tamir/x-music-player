@@ -1,0 +1,36 @@
+{
+  "_generation_id": "lwe5e81r",
+  "_app_id": "music-player",
+  "_env": "default",
+  "_view_id": "admin",
+  "_mode": "refine",
+  "_artifact_type": "view",
+  "_resolved_task": {
+    "_action": "update",
+    "_artifact_type": "view",
+    "_target_id": "admin",
+    "_edit_action": "hide",
+    "_edit_target_id": "admin-section-nav",
+    "_edit_target_type": "navlist",
+    "_explicit_artifact_type": true,
+    "_explicit_target_id": true,
+    "_module_ops": [],
+    "_source": "xvibe.apply-view-edit",
+    "_confidence": 1,
+    "_warnings": []
+  },
+  "_deterministic_mutation": {
+    "_eligible": true,
+    "_reason": "eligible",
+    "_type": "deterministic-view-edit",
+    "_action": "hide-object",
+    "_target_id": "admin-section-nav",
+    "_resolved_by": "id",
+    "_parent_id": "admin-toolbar",
+    "_hide_mechanism": "style.display:none",
+    "_target_view_id": "admin",
+    "_source_view_id": "admin",
+    "_requested_view_id": "admin"
+  },
+  "_created_at": "2026-08-12T18:51:26.144Z"
+}

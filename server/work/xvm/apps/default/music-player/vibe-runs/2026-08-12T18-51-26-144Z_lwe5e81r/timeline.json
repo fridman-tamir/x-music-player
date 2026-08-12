@@ -1,0 +1,38 @@
+[
+  {
+    "_stage": "loading-view",
+    "_message": "Loading current view...",
+    "_t_ms": 1,
+    "_at": "2026-08-12T18:51:26.145Z",
+    "_details": {
+      "_view_id": "admin",
+      "_mutation_action": "hide-object",
+      "_target_id": "admin-section-nav"
+    }
+  },
+  {
+    "_stage": "deterministic-mutating",
+    "_message": "Applying deterministic view edit...",
+    "_t_ms": 2,
+    "_at": "2026-08-12T18:51:26.146Z",
+    "_details": {
+      "_view_id": "admin",
+      "_source_view_id": "admin",
+      "_action": "hide-object",
+      "_target_id": "admin-section-nav"
+    }
+  },
+  {
+    "_stage": "saving",
+    "_message": "Saving view...",
+    "_t_ms": 4,
+    "_at": "2026-08-12T18:51:26.148Z",
+    "_details": {
+      "_view_id": "admin",
+      "_source_view_id": "admin",
+      "_persisted_view_id": "admin",
+      "_action": "hide-object",
+      "_target_id": "admin-section-nav"
+    }
+  }
+]

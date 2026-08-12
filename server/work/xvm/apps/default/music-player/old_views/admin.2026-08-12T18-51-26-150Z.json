@@ -77,9 +77,7 @@
                   "_label": "Import",
                   "_value": "import"
                 }
-              ],
-              "style": "display:none",
-              "_visible": false
+              ]
             },
             {
               "_id": "back-to-player-button",

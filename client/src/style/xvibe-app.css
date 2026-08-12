@@ -731,6 +731,10 @@
   align-items: start;
 }
 
+.schedule-list-pane--main {
+  width: 100%;
+}
+
 .playlist-master-pane,
 .playlist-detail-pane,
 .youtube-import-card,
@@ -871,8 +875,8 @@
 
 .schedule-days-grid {
   display: grid;
-  grid-template-columns: repeat(7, minmax(2.8rem, 1fr));
-  gap: 0.5rem;
+  grid-template-columns: repeat(7, minmax(2.35rem, 1fr));
+  gap: 0.35rem;
   width: 100%;
 }
 
@@ -880,22 +884,35 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  min-height: 2.25rem;
-  padding: 0.45rem 0.4rem;
+  gap: 0.32rem;
+  min-height: 2.1rem;
+  padding: 0.35rem 0.28rem;
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 6px;
   background: rgba(255, 255, 255, 0.04);
   color: var(--x-text);
   font-family: inherit;
+  font-size: 0.82rem;
+  white-space: nowrap;
 }
 
 .schedule-create-form .schedule-day-checkbox,
 .edit-schedule-form .schedule-day-checkbox {
-  width: 1rem;
-  min-width: 1rem;
-  height: 1rem;
+  width: 0.9rem;
+  min-width: 0.9rem;
+  height: 0.9rem;
   accent-color: #5bff9b;
+}
+
+.schedule-day-option:has(.schedule-day-checkbox:checked) {
+  border-color: rgba(91, 255, 155, 0.32);
+  background: rgba(57, 190, 112, 0.14);
+  color: #d7ffe6;
+}
+
+.create-schedule-modal-actions {
+  gap: 8px;
+  margin-top: 2px;
 }
 
 .schedule-advanced-section {

@@ -3,10 +3,11 @@
   "_app_id": "music-player",
   "_env": "default",
   "_created_at": "2026-08-11T18:51:38.444Z",
-  "_updated_at": "2026-08-11T18:51:38.444Z",
-  "_message_count": 0,
+  "_updated_at": "2026-08-12T18:51:04.229Z",
+  "_message_count": 2,
   "_title": "XStudio Conversation",
   "_metadata": {
     "_source": "xstudio"
-  }
+  },
+  "_last_message_at": "2026-08-12T18:51:04.229Z"
 }

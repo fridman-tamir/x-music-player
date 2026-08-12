@@ -1,0 +1,14 @@
+{
+  "_action": "update",
+  "_artifact_type": "view",
+  "_target_id": "admin",
+  "_edit_action": "hide",
+  "_edit_target_id": "admin-section-nav",
+  "_edit_target_type": "navlist",
+  "_explicit_artifact_type": true,
+  "_explicit_target_id": true,
+  "_module_ops": [],
+  "_source": "xvibe.apply-view-edit",
+  "_confidence": 1,
+  "_warnings": []
+}

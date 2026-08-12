@@ -3,7 +3,8 @@
   "_title": "Playlist Item",
   "_description": "Track entry inside a playlist.",
   "_meta": {
-    "_version": 1
+    "_version": 1,
+    "_name": "xent_YXBwOjpaR1ZtWVhWc2RBOjpiWFZ6YVdNdGNHeGhlV1Z5OjpjR3hoZVd4cGMzUmZhWFJsYlE"
   },
   "_schema": {
     "_playlist_id": {
@@ -21,6 +22,24 @@
     "_enabled": {
       "_type": "Boolean",
       "_default": true
+    },
+    "_id": {
+      "_type": "ObjectId",
+      "_required": false,
+      "_index": {
+        "_unique": true,
+        "_primary": true
+      },
+      "_immutable": true
+    },
+    "_created_at": {
+      "_type": "Date",
+      "_required": false,
+      "_immutable": true
+    },
+    "_updated_at": {
+      "_type": "Date",
+      "_required": false
     }
   }
 }
