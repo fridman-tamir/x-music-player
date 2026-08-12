@@ -6,16 +6,17 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
 
+WORKDIR /app
+
+COPY pnpm-workspace.yaml ./
+COPY server/package.json ./server/package.json
+
+RUN corepack enable
+RUN pnpm install --filter ./server...
+
+COPY server/ ./server/
+
+RUN pnpm --filter ./server build
+
 WORKDIR /app/server
-
-COPY server/package.json ./
-COPY server/pnpm-lock.yaml* ./
-
-RUN pnpm config set minimumReleaseAge 0
-RUN pnpm install --frozen-lockfile
-
-COPY server/ ./
-
-RUN pnpm build
-
 CMD ["pnpm", "start"]
