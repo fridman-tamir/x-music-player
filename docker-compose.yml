@@ -19,5 +19,9 @@ services:
     devices:
       - /dev/snd:/dev/snd
     
+    group_add:
+      - "29"
+
+    
     
       
