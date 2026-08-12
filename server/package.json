@@ -5,7 +5,7 @@
   "main": "./dist/main.js",
   "scripts": {
     "build": "tsc -p .",
-    "test:admin-ui": "node tests/admin-create-playlist-modal.test.mjs && node tests/admin-create-schedule-modal.test.mjs",
+    "test:admin-ui": "node tests/admin-create-playlist-modal.test.mjs && node tests/admin-create-schedule-modal.test.mjs && node tests/admin-edit-schedule-modal.test.mjs",
     "start": "node dist/main.js",
     "dev": "tsc -p . && node dist/main.js"
   },

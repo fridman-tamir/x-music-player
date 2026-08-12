@@ -1,18 +1,14 @@
 services:
-  xpell-vibe:
-    build:
-      context: .
-    container_name: xpell-vibe
+  reut-music-player:
+    build: .
+    container_name: reut-music-player
     restart: unless-stopped
-    env_file:
-      - ./server/.env
+
     ports:
-      - "3001:3000"
+      - "80:80"
+
     volumes:
       - ./server/work:/app/server/work
-    networks:
-      - xpell-net
 
-networks:
-  xpell-net:
-    external: true
+    environment:
+      YTDLP_PATH: /home/pi/.local/bin/yt-dlp

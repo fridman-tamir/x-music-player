@@ -681,6 +681,24 @@ export class MusicPlayerClient extends XModule {
         return this.readXDataString(key) || this.readControlString(object_id);
     }
 
+    private hasControlValueState(object_id: string) {
+        const control = (XUI as any).getObject?.(object_id);
+
+        if (control?.getValue) {
+            return true;
+        }
+
+        const dom = control?.dom ?? control?.getDOMObject?.();
+
+        return Boolean(dom && "value" in dom);
+    }
+
+    private readControlOrXDataString(key: string, object_id: string) {
+        return this.hasControlValueState(object_id)
+            ? this.readControlString(object_id)
+            : this.readXDataString(key);
+    }
+
     private readParamString(xcmd: ClientXCommand | undefined, field: string) {
         const value = xcmd?._params?.[field];
 
@@ -731,6 +749,42 @@ export class MusicPlayerClient extends XModule {
 
         const parsed = Number(value);
         return Number.isFinite(parsed) ? parsed : undefined;
+    }
+
+    private readXDataOrControlNumber(key: string, object_id: string, fallback: number) {
+        const value = this.readControlOrXDataString(key, object_id);
+
+        if (!value) {
+            return fallback;
+        }
+
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : fallback;
+    }
+
+    private readXDataOrControlOptionalNumber(key: string, object_id: string) {
+        const value = this.readControlOrXDataString(key, object_id);
+
+        if (!value) {
+            return undefined;
+        }
+
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed : undefined;
+    }
+
+    private readXDataOrControlBoolean(key: string, object_id: string, fallback: boolean) {
+        const value = this.readControlOrXDataString(key, object_id);
+
+        if (value === "true") {
+            return true;
+        }
+
+        if (value === "false") {
+            return false;
+        }
+
+        return fallback;
     }
 
     private readXDataBoolean(key: string, fallback: boolean) {
@@ -1568,9 +1622,18 @@ export class MusicPlayerClient extends XModule {
         return value === true || value === "true";
     }
 
-    private readScheduleDaysFromConfigs(configs: Array<{ _day: string; _xdata_key: string }>) {
+    private hasControlCheckedState(object_id: string) {
+        const control = (XUI as any).getObject?.(object_id);
+        const dom = control?.dom ?? control?.getDOMObject?.();
+
+        return Boolean(dom && "checked" in dom);
+    }
+
+    private readScheduleDaysFromConfigs(configs: Array<{ _day: string; _xdata_key: string; _object_id: string }>) {
         return configs
-            .filter((day: any) => this.readScheduleDaySelected(day._xdata_key) || this.readControlChecked(day._object_id))
+            .filter((day: any) => this.hasControlCheckedState(day._object_id)
+                ? this.readControlChecked(day._object_id)
+                : this.readScheduleDaySelected(day._xdata_key))
             .map((day) => day._day);
     }
 
@@ -1644,6 +1707,12 @@ export class MusicPlayerClient extends XModule {
         this.setControlValue("edit-schedule-volume-input", volume);
         this.setControlValue("edit-schedule-shuffle-input", shuffle);
         this.setControlValue("edit-schedule-enabled-input", enabled);
+    }
+
+    private showEditScheduleModal(source: string, schedule: any) {
+        this.syncEditScheduleForm(source, schedule);
+        XUI.show("edit-schedule-modal");
+        queueMicrotask(() => this.syncEditScheduleForm(source, schedule));
     }
 
     private initializeDefaultScheduleDay(source: string) {
@@ -2705,9 +2774,8 @@ export class MusicPlayerClient extends XModule {
         }
 
         this.buildPlaylistOptions(source);
-        this.syncEditScheduleForm(source, schedule);
         this.syncPlaylistSelector(source);
-        XUI.show("edit-schedule-modal");
+        this.showEditScheduleModal(source, schedule);
 
         return {
             _ok: true,
@@ -2721,10 +2789,10 @@ export class MusicPlayerClient extends XModule {
 
         try {
             const schedule_id = this.readXDataString("music-edit-schedule-id");
-            const playlist_id = this.readXDataString("music-edit-schedule-playlist-id");
-            const name = this.readXDataString("music-edit-schedule-name");
-            const start_time = this.readXDataString("music-edit-schedule-start-time");
-            const end_time = this.readXDataString("music-edit-schedule-end-time");
+            const playlist_id = this.readControlOrXDataString("music-edit-schedule-playlist-id", "edit-schedule-playlist-select");
+            const name = this.readControlOrXDataString("music-edit-schedule-name", "edit-schedule-name-input");
+            const start_time = this.readControlOrXDataString("music-edit-schedule-start-time", "edit-schedule-start-time-input");
+            const end_time = this.readControlOrXDataString("music-edit-schedule-end-time", "edit-schedule-end-time-input");
             const days = this.readEditScheduleDays();
 
             if (!schedule_id) {
@@ -2787,7 +2855,7 @@ export class MusicPlayerClient extends XModule {
                 return result;
             }
 
-            const volume = this.readXDataOptionalNumber("music-edit-schedule-volume");
+            const volume = this.readXDataOrControlOptionalNumber("music-edit-schedule-volume", "edit-schedule-volume-input");
             const params: Record<string, any> = {
                 _schedule_id: schedule_id,
                 _name: name,
@@ -2795,9 +2863,9 @@ export class MusicPlayerClient extends XModule {
                 _days: days,
                 _start_time: start_time,
                 _end_time: end_time,
-                _priority: this.readXDataNumber("music-edit-schedule-priority", 0),
-                _enabled: this.readXDataBoolean("music-edit-schedule-enabled", true),
-                _shuffle: this.readXDataBoolean("music-edit-schedule-shuffle", false)
+                _priority: this.readXDataOrControlNumber("music-edit-schedule-priority", "edit-schedule-priority-input", 0),
+                _enabled: this.readXDataOrControlBoolean("music-edit-schedule-enabled", "edit-schedule-enabled-input", true),
+                _shuffle: this.readXDataOrControlBoolean("music-edit-schedule-shuffle", "edit-schedule-shuffle-input", false)
             };
 
             if (volume !== undefined) {
