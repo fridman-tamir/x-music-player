@@ -1,0 +1,95 @@
+[
+  {
+    "_stage": "preparing",
+    "_message": "Preparing generation...",
+    "_t_ms": 0,
+    "_at": "2026-06-23T19:59:45.394Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main"
+    }
+  },
+  {
+    "_stage": "planning",
+    "_message": "Planning intent...",
+    "_t_ms": 0,
+    "_at": "2026-06-23T19:59:45.394Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main"
+    }
+  },
+  {
+    "_stage": "selecting-skills",
+    "_message": "Selecting skills...",
+    "_t_ms": 4,
+    "_at": "2026-06-23T19:59:45.398Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main"
+    }
+  },
+  {
+    "_stage": "skills-selected",
+    "_message": "Skills selected",
+    "_t_ms": 13,
+    "_at": "2026-06-23T19:59:45.407Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main",
+      "_skill_ids": [
+        "xpell-contract",
+        "xpell-core",
+        "label",
+        "xui-core"
+      ],
+      "_duration_ms": 9,
+      "_planning_duration_ms": 4
+    }
+  },
+  {
+    "_stage": "loading-view",
+    "_message": "Loading current view...",
+    "_t_ms": 14,
+    "_at": "2026-06-23T19:59:45.408Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main"
+    }
+  },
+  {
+    "_stage": "building-prompt",
+    "_message": "Building prompt...",
+    "_t_ms": 14,
+    "_at": "2026-06-23T19:59:45.408Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main"
+    }
+  },
+  {
+    "_stage": "generating",
+    "_message": "Generating JSON...",
+    "_t_ms": 15,
+    "_at": "2026-06-23T19:59:45.409Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main",
+      "_duration_ms": 1
+    }
+  },
+  {
+    "_stage": "failed",
+    "_message": "Generation failed",
+    "_t_ms": 854,
+    "_at": "2026-06-23T19:59:46.248Z",
+    "_details": {
+      "_artifact_type": "view",
+      "_view_id": "main",
+      "_error": {
+        "_name": "Error",
+        "_message": "Aime provider generate failed (E_XAI_PROVIDER_GENERATE_FAILED): AI provider request failed"
+      }
+    }
+  }
+]

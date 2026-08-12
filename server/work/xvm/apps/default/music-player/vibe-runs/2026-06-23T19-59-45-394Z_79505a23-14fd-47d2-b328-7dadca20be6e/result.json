@@ -1,0 +1,9 @@
+{
+  "_artifact_type": "view",
+  "_view_id": "main",
+  "_success": false,
+  "_error": {
+    "_name": "Error",
+    "_message": "Aime provider generate failed (E_XAI_PROVIDER_GENERATE_FAILED): AI provider request failed"
+  }
+}

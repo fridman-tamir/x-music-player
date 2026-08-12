@@ -1,0 +1,34 @@
+{
+  "_generation_id": "f86ac66c-bf29-47dd-91dd-1320e0107dc3",
+  "_app_id": "music-player",
+  "_env": "default",
+  "_view_id": "main",
+  "_artifact_type": "view",
+  "_mode": "refine",
+  "_resolved_task": {
+    "_action": "update",
+    "_artifact_type": "view",
+    "_edit_action": "update",
+    "_explicit_artifact_type": true,
+    "_explicit_target_id": false,
+    "_module_ops": [],
+    "_source": "view_child_edit_intent",
+    "_confidence": 0.85,
+    "_warnings": []
+  },
+  "_deterministic_mutation": {
+    "_eligible": false,
+    "_reason": "unsupported_field",
+    "_details": {}
+  },
+  "_success": false,
+  "_selected_skill_ids": [
+    "xpell-contract",
+    "xpell-core",
+    "label",
+    "xui-core",
+    "view"
+  ],
+  "_duration_ms": 171,
+  "_created_at": "2026-06-23T19:56:35.738Z"
+}

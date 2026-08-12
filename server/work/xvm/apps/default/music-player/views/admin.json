@@ -1,0 +1,1754 @@
+{
+  "_id": "admin",
+  "_type": "view",
+  "_on_show_animation": "animate__fadeIn",
+  "_on": {
+    "mount": {
+      "_module": "music-player-client",
+      "_op": "init-admin-view",
+      "_params": {}
+    }
+  },
+  "_children": [
+    {
+      "_id": "admin-css",
+      "_type": "style-sheet",
+      "_href": "http://localhost:3000/public/custom.css"
+    },
+    {
+      "_id": "admin-app",
+      "_type": "view",
+      "class": "rehab-admin-app app-ctx dash-app",
+      "_children": [
+        {
+          "_id": "admin-toolbar",
+          "_type": "toolbar",
+          "class": "admin-toolbar page-toolbar music-admin-header",
+          "_justify": "space-between",
+          "_align": "center",
+          "_wrap": true,
+          "_children": [
+            {
+              "_id": "admin-toolbar-left",
+              "_type": "stack",
+              "_direction": "vertical",
+              "_gap": 4,
+              "class": "page-toolbar__left",
+              "_children": [
+                {
+                  "_id": "admin-title",
+                  "_type": "label",
+                  "_text": "Music Administration",
+                  "class": "rehab-title"
+                },
+                {
+                  "_id": "admin-subtitle",
+                  "_type": "label",
+                  "_text": "Manage the resident music library, playlists, schedules, and imports.",
+                  "class": "rehab-subtitle"
+                }
+              ]
+            },
+            {
+              "_id": "admin-section-nav",
+              "_type": "navlist",
+              "class": "admin-section-nav",
+              "_active": "playlists",
+              "_dense": true,
+              "_items": [
+                {
+                  "_id": "admin-nav-library",
+                  "_label": "Library",
+                  "_value": "library"
+                },
+                {
+                  "_id": "admin-nav-playlists",
+                  "_label": "Playlists",
+                  "_value": "playlists",
+                  "_active": true
+                },
+                {
+                  "_id": "admin-nav-schedules",
+                  "_label": "Schedules",
+                  "_value": "schedules"
+                },
+                {
+                  "_id": "admin-nav-import",
+                  "_label": "Import",
+                  "_value": "import"
+                }
+              ]
+            },
+            {
+              "_id": "back-to-player-button",
+              "_type": "button",
+              "_text": "Back to Player",
+              "_on": {
+                "click": {
+                  "_module": "xvm",
+                  "_op": "navigate",
+                  "_params": {
+                    "_to": "main",
+                    "_region": "main"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "_id": "admin-content",
+          "_type": "view",
+          "class": "admin-content playlist-admin-content",
+          "_children": [
+            {
+              "_id": "playlist-manager-panel",
+              "_type": "xsection",
+              "class": "panel admin-panel playlist-manager-panel music-admin-playlists-section",
+              "_title": "Playlists",
+              "_subtitle": "Build sets for daily programs, select one, then manage its tracks.",
+              "_children": [
+                {
+                  "_id": "playlist-master-detail",
+                  "_type": "view",
+                  "class": "playlist-master-detail",
+                  "_children": [
+                    {
+                      "_id": "playlist-master-pane",
+                      "_type": "xsection",
+                      "class": "playlist-master-pane",
+                      "_title": "Playlist List",
+                      "_subtitle": "Choose the set to manage.",
+                      "_actions": [
+                        {
+                          "_id": "open-create-playlist-button",
+                          "_type": "button",
+                          "_text": "+ Create Playlist",
+                          "_variant": "primary",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "open-create-playlist-modal",
+                              "_params": {}
+                            }
+                          }
+                        }
+                      ],
+                      "_children": [
+                        {
+                          "_id": "playlist-status",
+                          "_type": "label",
+                          "_text": "Select a playlist to manage its tracks.",
+                          "class": "admin-panel-subtitle playlist-status",
+                          "_data_source": "music-playlist-status",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        },
+                        {
+                          "_id": "playlists-list",
+                          "_type": "xgallery",
+                          "class": "playlist-gallery",
+                          "_data_source": "music-playlist-cards",
+                          "_columns": 1,
+                          "_min_col_width": 220,
+                          "_gap": 10,
+                          "_row_key": "_id",
+                          "_empty_text": "No playlists yet.",
+                          "_item": {
+                            "_title": "$row._name",
+                            "_subtitle": "$row._admin_subtitle",
+                            "_description": "$row._description",
+                            "_badge": "$row._admin_badge",
+                            "_actions": [
+                              {
+                                "_type": "button",
+                                "_text": "Select",
+                                "_variant": "primary",
+                                "_on": {
+                                  "click": [
+                                    {
+                                      "_module": "xd",
+                                      "_op": "set",
+                                      "_params": {
+                                        "key": "music-selected-playlist-id",
+                                        "value": "$row._id",
+                                        "source": "admin.playlist.select"
+                                      }
+                                    },
+                                    {
+                                      "_module": "music-player-client",
+                                      "_op": "get-playlist-details",
+                                      "_params": {
+                                        "_playlist_id": "$row._id"
+                                      }
+                                    }
+                                  ]
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "_id": "playlist-detail-pane",
+                      "_type": "xsection",
+                      "class": "playlist-detail-pane",
+                      "_title": "Selected Playlist",
+                      "_subtitle": "Edit details or add library tracks.",
+                      "_actions": [
+                        {
+                          "_id": "edit-playlist-button",
+                          "_type": "button",
+                          "_text": "Edit",
+                          "_variant": "primary",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "prepare-edit-playlist",
+                              "_params": {}
+                            }
+                          }
+                        },
+                        {
+                          "_id": "add-tracks-button",
+                          "_type": "button",
+                          "_text": "Add Tracks",
+                          "_variant": "primary",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "open-add-tracks-modal",
+                              "_params": {}
+                            }
+                          }
+                        }
+                      ],
+                      "_children": [
+                        {
+                          "_id": "selected-playlist-summary",
+                          "_type": "view",
+                          "class": "selected-playlist-summary",
+                          "_children": [
+                            {
+                              "_id": "selected-playlist-name",
+                              "_type": "label",
+                              "_text": "No playlist selected.",
+                              "class": "selected-playlist-name",
+                              "_data_source": "music-selected-playlist-name",
+                              "_on_data": {
+                                "_op": "set-text-from-data"
+                              }
+                            },
+                            {
+                              "_id": "selected-playlist-status",
+                              "_type": "badge",
+                              "_text": "No selection",
+                              "_variant": "info",
+                              "class": "selected-playlist-status",
+                              "_data_source": "music-selected-playlist-status-label",
+                              "_on_data": {
+                                "_op": "set-text-from-data"
+                              }
+                            },
+                            {
+                              "_id": "selected-playlist-mood",
+                              "_type": "label",
+                              "_text": "Mood not set.",
+                              "class": "admin-panel-subtitle selected-playlist-meta",
+                              "_data_source": "music-selected-playlist-mood-label",
+                              "_on_data": {
+                                "_op": "set-text-from-data"
+                              }
+                            },
+                            {
+                              "_id": "selected-playlist-description",
+                              "_type": "label",
+                              "_text": "Select a playlist to review tracks.",
+                              "class": "admin-panel-subtitle selected-playlist-description",
+                              "_data_source": "music-selected-playlist-description-label",
+                              "_on_data": {
+                                "_op": "set-text-from-data"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "_id": "playlist-items-table",
+                          "_type": "table",
+                          "class": "data-table playlist-items-table",
+                          "_data_source": "music-playlist-items-display",
+                          "_columns": [
+                            {
+                              "_key": "_order_label",
+                              "_title": "Order"
+                            },
+                            {
+                              "_key": "_track_title",
+                              "_title": "Track Title"
+                            },
+                            {
+                              "_key": "_track_status_label",
+                              "_title": "Status"
+                            },
+                            {
+                              "_key": "actions",
+                              "_title": "Actions",
+                              "_type": "actions",
+                              "_actions": [
+                                {
+                                  "_type": "button",
+                                  "_text": "Remove",
+                                  "_variant": "danger",
+                                  "_on": {
+                                    "click": {
+                                      "_module": "music-player-client",
+                                      "_op": "remove-playlist-item",
+                                      "_params": {
+                                        "_playlist_item_id": "$row._playlist_item_id"
+                                      }
+                                    }
+                                  }
+                                }
+                              ]
+                            }
+                          ],
+                          "_empty_text": "No tracks in this playlist.",
+                          "_dense": true,
+                          "_hover": true
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "_id": "youtube-download-panel",
+              "_type": "xsection",
+              "class": "panel admin-panel youtube-download-panel music-admin-import-section",
+              "_title": "Import",
+              "_subtitle": "Download new tracks into the local library, then refresh the catalog.",
+              "_children": [
+                {
+                  "_id": "youtube-import-card",
+                  "_type": "xsection",
+                  "class": "youtube-import-card",
+                  "_title": "YouTube Download",
+                  "_subtitle": "Add one video's audio as an MP3 track.",
+                  "_children": [
+                    {
+                      "_id": "youtube-download-form",
+                      "_type": "view",
+                      "class": "youtube-download-form",
+                      "_children": [
+                        {
+                          "_id": "youtube-url-field",
+                          "_type": "field",
+                          "_label": "YouTube URL",
+                          "_control": {
+                            "_id": "youtube-url-input",
+                            "_type": "text",
+                            "placeholder": "https://www.youtube.com/watch?v=..."
+                          },
+                          "_data_output": "music-youtube-url",
+                          "_update_data_source_event": "input"
+                        },
+                        {
+                          "_id": "youtube-track-name-field",
+                          "_type": "field",
+                          "_label": "Track name",
+                          "_control": {
+                            "_id": "youtube-track-name-input",
+                            "_type": "text",
+                            "placeholder": "Enter track name"
+                          },
+                          "_data_output": "music-youtube-track-name",
+                          "_update_data_source_event": "input"
+                        },
+                        {
+                          "_id": "youtube-download-button",
+                          "_type": "button",
+                          "_text": "Download",
+                          "_variant": "primary",
+                          "class": "full-button youtube-download-button",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "download-youtube",
+                              "_params": {}
+                            }
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "_id": "youtube-download-progress-panel",
+                      "_type": "view",
+                      "class": "youtube-download-progress-panel",
+                      "_children": [
+                        {
+                          "_id": "youtube-download-title-label",
+                          "_type": "label",
+                          "_text": "No YouTube download active.",
+                          "class": "admin-panel-subtitle youtube-download-title-label",
+                          "_data_source": "music-youtube-download-title",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        },
+                        {
+                          "_id": "youtube-download-progress-row",
+                          "_type": "view",
+                          "class": "youtube-download-progress-row",
+                          "_children": [
+                            {
+                              "_id": "youtube-download-progress-line",
+                              "_type": "view",
+                              "class": "youtube-progress-line",
+                              "_children": [
+                                {
+                                  "_id": "youtube-download-progress-fill",
+                                  "_type": "view",
+                                  "class": "youtube-progress-fill",
+                                  "style": "width:0%"
+                                }
+                              ]
+                            },
+                            {
+                              "_id": "youtube-download-progress-label",
+                              "_type": "label",
+                              "_text": "0%",
+                              "class": "small-label youtube-download-percent",
+                              "_data_source": "music-youtube-download-progress-label",
+                              "_on_data": {
+                                "_op": "set-text-from-data"
+                              }
+                            }
+                          ]
+                        },
+                        {
+                          "_id": "youtube-download-status",
+                          "_type": "label",
+                          "_text": "Ready.",
+                          "class": "admin-panel-subtitle youtube-download-status",
+                          "_data_source": "music-youtube-download-status",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        },
+                        {
+                          "_id": "youtube-download-error",
+                          "_type": "label",
+                          "_text": "",
+                          "class": "admin-panel-subtitle youtube-download-error",
+                          "_data_source": "music-youtube-download-error",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "_id": "schedule-panel",
+              "_type": "xsection",
+              "class": "panel admin-panel schedule-manager-panel music-admin-schedules-section",
+              "_title": "Schedules",
+              "_subtitle": "Create and manage playlist schedules for recurring music blocks.",
+              "_children": [
+                {
+                  "_id": "schedule-management-layout",
+                  "_type": "view",
+                  "class": "schedule-management-layout",
+                  "_children": [
+                    {
+                      "_id": "schedule-create-pane",
+                      "_type": "xsection",
+                      "class": "schedule-create-pane",
+                      "_title": "Create Schedule",
+                      "_subtitle": "Choose the playlist, days, and playback window.",
+                      "_actions": [
+                        {
+                          "_id": "create-schedule-button",
+                          "_type": "button",
+                          "_text": "Create Schedule",
+                          "_variant": "primary",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "create-schedule",
+                              "_params": {}
+                            }
+                          }
+                        }
+                      ],
+                      "_children": [
+                        {
+                          "_id": "schedule-create-form",
+                          "_type": "stack",
+                          "class": "form-layout schedule-create-form",
+                          "_gap": 14,
+                          "_children": [
+                            {
+                              "_id": "schedule-primary-row",
+                              "_type": "view",
+                              "class": "schedule-form-row schedule-primary-row",
+                              "_children": [
+                                {
+                                  "_id": "schedule-name-field",
+                                  "_type": "field",
+                                  "_label": "Schedule Name",
+                                  "_control": {
+                                    "_id": "schedule-name-input",
+                                    "_type": "text",
+                                    "placeholder": "Morning block"
+                                  },
+                                  "_data_output": "music-schedule-name",
+                                  "_update_data_source_event": "input"
+                                },
+                                {
+                                  "_id": "schedule-playlist-field",
+                                  "_type": "field",
+                                  "_label": "Playlist",
+                                  "_control": {
+                                    "_id": "schedule-playlist-select",
+                                    "_type": "xselect",
+                                    "_placeholder": "Select playlist",
+                                    "_data_source": "music-playlist-options",
+                                    "_selected_data_source": "music-schedule-playlist-id",
+                                    "_data_output": "music-schedule-playlist-id",
+                                    "_options": []
+                                  },
+                                  "_update_data_source_event": "change"
+                                }
+                              ]
+                            },
+                            {
+                              "_id": "schedule-days-field",
+                              "_type": "field",
+                              "_label": "Days",
+                              "_control": {
+                                "_id": "schedule-days-checkbox-group",
+                                "_type": "view",
+                                "class": "schedule-days-grid",
+                                "_children": [
+                                  {
+                                    "_id": "schedule-day-sun",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-sun-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-sun",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-sun-label",
+                                        "_type": "label",
+                                        "_text": "Sun"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-mon",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-mon-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-mon",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-mon-label",
+                                        "_type": "label",
+                                        "_text": "Mon"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-tue",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-tue-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-tue",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-tue-label",
+                                        "_type": "label",
+                                        "_text": "Tue"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-wed",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-wed-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-wed",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-wed-label",
+                                        "_type": "label",
+                                        "_text": "Wed"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-thu",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-thu-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-thu",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-thu-label",
+                                        "_type": "label",
+                                        "_text": "Thu"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-fri",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-fri-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-fri",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-fri-label",
+                                        "_type": "label",
+                                        "_text": "Fri"
+                                      }
+                                    ]
+                                  },
+                                  {
+                                    "_id": "schedule-day-sat",
+                                    "_type": "view",
+                                    "class": "schedule-day-option",
+                                    "_children": [
+                                      {
+                                        "_id": "schedule-day-sat-checkbox",
+                                        "_type": "input",
+                                        "type": "checkbox",
+                                        "class": "schedule-day-checkbox",
+                                        "_on": {
+                                          "change": {
+                                            "_module": "xd",
+                                            "_op": "set",
+                                            "_params": {
+                                              "key": "music-schedule-day-sat",
+                                              "value": "$event.target.checked",
+                                              "source": "admin.schedule.day"
+                                            }
+                                          }
+                                        }
+                                      },
+                                      {
+                                        "_id": "schedule-day-sat-label",
+                                        "_type": "label",
+                                        "_text": "Sat"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            },
+                    {
+                      "_id": "schedule-time-row",
+                      "_type": "view",
+                      "class": "schedule-form-row",
+                      "_children": [
+                        {
+                          "_id": "schedule-start-time-field",
+                          "_type": "field",
+                          "_label": "Start Time",
+                          "_control": {
+                            "_id": "schedule-start-time-input",
+                            "_type": "text",
+                            "placeholder": "08:00"
+                          },
+                          "_data_output": "music-schedule-start-time",
+                          "_update_data_source_event": "input"
+                        },
+                        {
+                          "_id": "schedule-end-time-field",
+                          "_type": "field",
+                          "_label": "End Time",
+                          "_control": {
+                            "_id": "schedule-end-time-input",
+                            "_type": "text",
+                            "placeholder": "12:00"
+                          },
+                          "_data_output": "music-schedule-end-time",
+                          "_update_data_source_event": "input"
+                        }
+                      ]
+                    },
+                    {
+                      "_id": "schedule-options-row",
+                      "_type": "view",
+                              "class": "schedule-form-row schedule-options-row",
+                      "_children": [
+                        {
+                                  "_id": "schedule-volume-field",
+                          "_type": "field",
+                                  "_label": "Volume",
+                          "_control": {
+                                    "_id": "schedule-volume-input",
+                            "_type": "text",
+                                    "placeholder": "Optional"
+                          },
+                                  "_data_output": "music-schedule-volume",
+                          "_update_data_source_event": "input"
+                        },
+                        {
+                                  "_id": "schedule-shuffle-field",
+                          "_type": "field",
+                                  "_label": "Shuffle",
+                          "_control": {
+                                    "_id": "schedule-shuffle-input",
+                                    "_type": "xselect",
+                                    "_options": [
+                                      {
+                                        "value": "false",
+                                        "label": "Shuffle: Off"
+                                      },
+                                      {
+                                        "value": "true",
+                                        "label": "Shuffle: On"
+                                      }
+                                    ]
+                          },
+                                  "_data_output": "music-schedule-shuffle",
+                                  "_update_data_source_event": "change"
+                        }
+                      ]
+                    },
+                    {
+                              "_id": "schedule-enabled-row",
+                      "_type": "view",
+                              "class": "schedule-form-row schedule-enabled-row",
+                      "_children": [
+                        {
+                                  "_id": "schedule-enabled-field",
+                          "_type": "field",
+                                  "_label": "Enabled",
+                          "_control": {
+                                    "_id": "schedule-enabled-input",
+                            "_type": "xselect",
+                            "_options": [
+                              {
+                                        "value": "true",
+                                        "label": "Enabled"
+                              },
+                              {
+                                        "value": "false",
+                                        "label": "Disabled"
+                              }
+                            ]
+                          },
+                                  "_data_output": "music-schedule-enabled",
+                          "_update_data_source_event": "change"
+                                }
+                              ]
+                            },
+                            {
+                              "_id": "schedule-advanced-section",
+                              "_type": "xsection",
+                              "class": "schedule-advanced-section",
+                              "_title": "Advanced",
+                              "_subtitle": "Priority is optional and only affects schedule ordering.",
+                              "_children": [
+                                {
+                                  "_id": "schedule-priority-field",
+                                  "_type": "field",
+                                  "_label": "Priority",
+                                  "_control": {
+                                    "_id": "schedule-priority-input",
+                                    "_type": "text",
+                                    "placeholder": "0"
+                                  },
+                                  "_data_output": "music-schedule-priority",
+                                  "_update_data_source_event": "input"
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "_id": "schedule-status",
+                          "_type": "label",
+                          "_text": "Select a playlist and create a schedule.",
+                          "class": "admin-panel-subtitle schedule-status",
+                          "_data_source": "music-schedule-status",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        }
+                      ]
+                    },
+                    {
+                      "_id": "schedule-list-pane",
+                      "_type": "xsection",
+                      "class": "schedule-list-pane",
+                      "_title": "Scheduled Playlists",
+                      "_subtitle": "Compact view of active and disabled music blocks.",
+                      "_children": [
+                        {
+                          "_id": "schedules-gallery",
+                          "_type": "xgallery",
+                          "class": "schedules-gallery",
+                          "_data_source": "music-schedule-cards",
+                          "_columns": 1,
+                          "_min_col_width": 280,
+                          "_gap": 12,
+                          "_row_key": "_id",
+                          "_empty_text": "No schedules yet.",
+                          "_item": {
+                            "_title": "$row._name",
+                            "_subtitle": "$row._schedule_time_label",
+                            "_description": "$row._schedule_description",
+                            "_meta": "$row._schedule_meta",
+                            "_badge": "$row._schedule_status_label",
+                            "_actions": [
+                              {
+                                "_type": "button",
+                                "_text": "Edit",
+                                "_variant": "primary",
+                                "_on": {
+                                  "click": {
+                                    "_module": "music-player-client",
+                                    "_op": "prepare-edit-schedule",
+                                    "_params": {
+                                      "_schedule_id": "$row._id"
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "_type": "button",
+                                "_text": "Enable",
+                                "_variant": "primary",
+                                "_on": {
+                                  "click": {
+                                    "_module": "music-player-client",
+                                    "_op": "set-schedule-enabled",
+                                    "_params": {
+                                      "_schedule_id": "$row._id",
+                                      "_enabled": true
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "_type": "button",
+                                "_text": "Disable",
+                                "_variant": "secondary",
+                                "_on": {
+                                  "click": {
+                                    "_module": "music-player-client",
+                                    "_op": "set-schedule-enabled",
+                                    "_params": {
+                                      "_schedule_id": "$row._id",
+                                      "_enabled": false
+                                    }
+                                  }
+                                }
+                              },
+                              {
+                                "_type": "button",
+                                "_text": "Delete",
+                                "_variant": "danger",
+                                "_on": {
+                                  "click": {
+                                    "_module": "music-player-client",
+                                    "_op": "prepare-delete-schedule",
+                                    "_params": {
+                                      "_schedule_id": "$row._id"
+                                    }
+                                  }
+                                }
+                              }
+                            ]
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_id": "create-playlist-modal",
+          "_type": "modal",
+          "_title": "Create Playlist",
+          "_subtitle": "Create a reusable music set for programs or daily moments.",
+          "_children": [
+            {
+              "_id": "playlist-create-form",
+              "_type": "stack",
+              "class": "form-layout playlist-create-form",
+              "_gap": 14,
+              "_children": [
+                {
+                  "_id": "playlist-name-field",
+                  "_type": "field",
+                  "_label": "Playlist Name",
+                  "_required": true,
+                  "_control": {
+                    "_id": "playlist-name-input",
+                    "_type": "text",
+                    "placeholder": "Morning Calm",
+                    "required": true
+                  },
+                  "_data_output": "music-playlist-name",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "playlist-description-field",
+                  "_type": "field",
+                  "_label": "Playlist Description",
+                  "_control": {
+                    "_id": "playlist-description-input",
+                    "_type": "textarea",
+                    "rows": 3,
+                    "placeholder": "Soft music for the morning program."
+                  },
+                  "_data_output": "music-playlist-description",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "playlist-mood-field",
+                  "_type": "field",
+                  "_label": "Mood",
+                  "_control": {
+                    "_id": "playlist-mood-input",
+                    "_type": "text",
+                    "placeholder": "calm"
+                  },
+                  "_data_output": "music-playlist-mood",
+                  "_update_data_source_event": "input"
+                }
+              ]
+            },
+            {
+              "_id": "create-playlist-status",
+              "_type": "label",
+              "_text": "",
+              "class": "admin-panel-subtitle create-playlist-status",
+              "_data_source": "music-create-playlist-status",
+              "_on_data": {
+                "_op": "set-text-from-data"
+              }
+            },
+            {
+              "_id": "create-playlist-modal-actions",
+              "_type": "toolbar",
+              "class": "admin-actions-row create-playlist-modal-actions",
+              "_justify": "end",
+              "_align": "center",
+              "_wrap": true,
+              "_children": [
+                {
+                  "_id": "cancel-create-playlist-button",
+                  "_type": "button",
+                  "_text": "Cancel",
+                  "_on": {
+                    "click": {
+                      "_module": "music-player-client",
+                      "_op": "cancel-create-playlist",
+                      "_params": {}
+                    }
+                  }
+                },
+                {
+                  "_id": "create-playlist-button",
+                  "_type": "button",
+                  "_text": "Create Playlist",
+                  "_variant": "primary",
+                  "_on": {
+                    "click": {
+                      "_module": "music-player-client",
+                      "_op": "create-playlist",
+                      "_params": {}
+                    }
+                  }
+                }
+              ]
+            }
+          ],
+          "_open": false,
+          "_size": "md",
+          "_closable": false,
+          "_close_on_backdrop": false
+        },
+        {
+          "_id": "edit-playlist-modal",
+          "_type": "modal",
+          "_title": "Edit Playlist",
+          "_children": [
+            {
+              "_id": "edit-playlist-form",
+              "_type": "stack",
+              "class": "form-layout playlist-edit-form",
+              "_gap": 14,
+              "_children": [
+                {
+                  "_id": "edit-playlist-name-field",
+                  "_type": "field",
+                  "_label": "Name",
+                  "_control": {
+                    "_id": "edit-playlist-name-input",
+                    "_type": "text",
+                    "placeholder": "Playlist name"
+                  },
+                  "_data_output": "music-edit-playlist-name",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "edit-playlist-description-field",
+                  "_type": "field",
+                  "_label": "Description",
+                  "_control": {
+                    "_id": "edit-playlist-description-input",
+                    "_type": "textarea",
+                    "rows": 3,
+                    "placeholder": "Playlist description"
+                  },
+                  "_data_output": "music-edit-playlist-description",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "edit-playlist-mood-field",
+                  "_type": "field",
+                  "_label": "Mood",
+                  "_control": {
+                    "_id": "edit-playlist-mood-input",
+                    "_type": "text",
+                    "placeholder": "calm"
+                  },
+                  "_data_output": "music-edit-playlist-mood",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "edit-playlist-status-field",
+                  "_type": "field",
+                  "_label": "Status",
+                  "_control": {
+                    "_id": "edit-playlist-status-select",
+                    "_type": "xselect",
+                    "_selected_data_source": "music-edit-playlist-status",
+                    "_data_output": "music-edit-playlist-status",
+                    "_options": [
+                      {
+                        "value": "active",
+                        "label": "Active"
+                      },
+                      {
+                        "value": "disabled",
+                        "label": "Disabled"
+                      }
+                    ]
+                  },
+                  "_update_data_source_event": "change"
+                }
+              ]
+            }
+          ],
+          "_open": false,
+          "_size": "md",
+          "_closable": true,
+          "_close_on_backdrop": true,
+          "_actions": [
+            {
+              "_type": "button",
+              "_text": "Save",
+              "_variant": "primary",
+              "_on": {
+                "click": {
+                  "_module": "music-player-client",
+                  "_op": "edit-playlist",
+                  "_params": {}
+                }
+              }
+            },
+            {
+              "_type": "button",
+              "_text": "Cancel",
+              "_on": {
+                "click": {
+                  "_op": "close-object",
+                  "_params": {
+                    "_id": "edit-playlist-modal"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "_id": "edit-schedule-modal",
+          "_type": "modal",
+          "_title": "Edit Schedule",
+          "_children": [
+            {
+              "_id": "edit-schedule-form",
+              "_type": "stack",
+              "class": "form-layout schedule-create-form edit-schedule-form",
+              "_gap": 14,
+              "_children": [
+                {
+                  "_id": "edit-schedule-name-field",
+                  "_type": "field",
+                  "_label": "Name",
+                  "_control": {
+                    "_id": "edit-schedule-name-input",
+                    "_type": "text",
+                    "placeholder": "Schedule name"
+                  },
+                  "_data_output": "music-edit-schedule-name",
+                  "_update_data_source_event": "input"
+                },
+                {
+                  "_id": "edit-schedule-playlist-field",
+                  "_type": "field",
+                  "_label": "Playlist",
+                  "_control": {
+                    "_id": "edit-schedule-playlist-select",
+                    "_type": "xselect",
+                    "_placeholder": "Select playlist",
+                    "_data_source": "music-playlist-options",
+                    "_selected_data_source": "music-edit-schedule-playlist-id",
+                    "_data_output": "music-edit-schedule-playlist-id",
+                    "_options": []
+                  },
+                  "_update_data_source_event": "change"
+                },
+                {
+                  "_id": "edit-schedule-days-field",
+                  "_type": "field",
+                  "_label": "Days",
+                  "_control": {
+                    "_id": "edit-schedule-days-checkbox-group",
+                    "_type": "view",
+                    "class": "schedule-days-grid",
+                    "_children": [
+                      {
+                        "_id": "edit-schedule-day-sun",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-sun-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-sun",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-sun-label",
+                            "_type": "label",
+                            "_text": "Sun"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-mon",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-mon-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-mon",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-mon-label",
+                            "_type": "label",
+                            "_text": "Mon"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-tue",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-tue-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-tue",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-tue-label",
+                            "_type": "label",
+                            "_text": "Tue"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-wed",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-wed-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-wed",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-wed-label",
+                            "_type": "label",
+                            "_text": "Wed"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-thu",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-thu-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-thu",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-thu-label",
+                            "_type": "label",
+                            "_text": "Thu"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-fri",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-fri-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-fri",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-fri-label",
+                            "_type": "label",
+                            "_text": "Fri"
+                          }
+                        ]
+                      },
+                      {
+                        "_id": "edit-schedule-day-sat",
+                        "_type": "view",
+                        "class": "schedule-day-option",
+                        "_children": [
+                          {
+                            "_id": "edit-schedule-day-sat-checkbox",
+                            "_type": "input",
+                            "type": "checkbox",
+                            "class": "schedule-day-checkbox",
+                            "_on": {
+                              "change": {
+                                "_module": "xd",
+                                "_op": "set",
+                                "_params": {
+                                  "key": "music-edit-schedule-day-sat",
+                                  "value": "$event.target.checked",
+                                  "source": "admin.edit-schedule.day"
+                                }
+                              }
+                            }
+                          },
+                          {
+                            "_id": "edit-schedule-day-sat-label",
+                            "_type": "label",
+                            "_text": "Sat"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                },
+                {
+                  "_id": "edit-schedule-time-row",
+                  "_type": "view",
+                  "class": "schedule-form-row",
+                  "_children": [
+                    {
+                      "_id": "edit-schedule-start-time-field",
+                      "_type": "field",
+                      "_label": "Start Time",
+                      "_control": {
+                        "_id": "edit-schedule-start-time-input",
+                        "_type": "text",
+                        "placeholder": "08:00"
+                      },
+                      "_data_output": "music-edit-schedule-start-time",
+                      "_update_data_source_event": "input"
+                    },
+                    {
+                      "_id": "edit-schedule-end-time-field",
+                      "_type": "field",
+                      "_label": "End Time",
+                      "_control": {
+                        "_id": "edit-schedule-end-time-input",
+                        "_type": "text",
+                        "placeholder": "12:00"
+                      },
+                      "_data_output": "music-edit-schedule-end-time",
+                      "_update_data_source_event": "input"
+                    }
+                  ]
+                },
+                {
+                  "_id": "edit-schedule-settings-row",
+                  "_type": "view",
+                  "class": "schedule-form-row",
+                  "_children": [
+                    {
+                      "_id": "edit-schedule-priority-field",
+                      "_type": "field",
+                      "_label": "Priority",
+                      "_control": {
+                        "_id": "edit-schedule-priority-input",
+                        "_type": "text",
+                        "placeholder": "0"
+                      },
+                      "_data_output": "music-edit-schedule-priority",
+                      "_update_data_source_event": "input"
+                    },
+                    {
+                      "_id": "edit-schedule-volume-field",
+                      "_type": "field",
+                      "_label": "Volume",
+                      "_control": {
+                        "_id": "edit-schedule-volume-input",
+                        "_type": "text",
+                        "placeholder": "Optional"
+                      },
+                      "_data_output": "music-edit-schedule-volume",
+                      "_update_data_source_event": "input"
+                    }
+                  ]
+                },
+                {
+                  "_id": "edit-schedule-toggle-row",
+                  "_type": "view",
+                  "class": "schedule-form-row",
+                  "_children": [
+                    {
+                      "_id": "edit-schedule-shuffle-field",
+                      "_type": "field",
+                      "_label": "Shuffle",
+                      "_control": {
+                        "_id": "edit-schedule-shuffle-input",
+                        "_type": "xselect",
+                        "_selected_data_source": "music-edit-schedule-shuffle",
+                        "_data_output": "music-edit-schedule-shuffle",
+                        "_options": [
+                          {
+                            "value": "false",
+                            "label": "Shuffle: Off"
+                          },
+                          {
+                            "value": "true",
+                            "label": "Shuffle: On"
+                          }
+                        ]
+                      },
+                      "_update_data_source_event": "change"
+                    },
+                    {
+                      "_id": "edit-schedule-enabled-field",
+                      "_type": "field",
+                      "_label": "Enabled",
+                      "_control": {
+                        "_id": "edit-schedule-enabled-input",
+                        "_type": "xselect",
+                        "_selected_data_source": "music-edit-schedule-enabled",
+                        "_data_output": "music-edit-schedule-enabled",
+                        "_options": [
+                          {
+                            "value": "true",
+                            "label": "Enabled"
+                          },
+                          {
+                            "value": "false",
+                            "label": "Disabled"
+                          }
+                        ]
+                      },
+                      "_update_data_source_event": "change"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "_open": false,
+          "_size": "md",
+          "_closable": true,
+          "_close_on_backdrop": true,
+          "_actions": [
+            {
+              "_type": "button",
+              "_text": "Save",
+              "_variant": "primary",
+              "_on": {
+                "click": {
+                  "_module": "music-player-client",
+                  "_op": "edit-schedule",
+                  "_params": {}
+                }
+              }
+            },
+            {
+              "_type": "button",
+              "_text": "Cancel",
+              "_on": {
+                "click": {
+                  "_op": "close-object",
+                  "_params": {
+                    "_id": "edit-schedule-modal"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "_id": "delete-schedule-confirm-modal",
+          "_type": "modal",
+          "_title": "Delete Schedule?",
+          "_children": [
+            {
+              "_id": "delete-schedule-confirm-message",
+              "_type": "label",
+              "_text": "Are you sure you want to delete this schedule?",
+              "class": "admin-panel-subtitle schedule-status"
+            }
+          ],
+          "_open": false,
+          "_size": "md",
+          "_closable": true,
+          "_close_on_backdrop": true,
+          "_actions": [
+            {
+              "_type": "button",
+              "_text": "Delete",
+              "_variant": "danger",
+              "_on": {
+                "click": {
+                  "_module": "music-player-client",
+                  "_op": "confirm-delete-schedule",
+                  "_params": {}
+                }
+              }
+            },
+            {
+              "_type": "button",
+              "_text": "Cancel",
+              "_on": {
+                "click": {
+                  "_op": "close-object",
+                  "_params": {
+                    "_id": "delete-schedule-confirm-modal"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        {
+          "_id": "music-library-modal",
+          "_type": "modal",
+          "_title": "Library",
+          "_subtitle": "Scan, refresh, and add tracks to the selected playlist.",
+          "_children": [
+            {
+              "_id": "music-library-modal-actions",
+              "_type": "toolbar",
+              "class": "admin-actions-row music-library-modal-actions",
+              "_justify": "space-between",
+              "_align": "center",
+              "_wrap": true,
+              "_children": [
+                {
+                  "_id": "modal-scan-music-folder-button",
+                  "_type": "button",
+                  "_text": "Scan Music Folder",
+                  "_variant": "primary",
+                  "_on": {
+                    "click": {
+                      "_module": "music-player-client",
+                      "_op": "scan-music-folder",
+                      "_params": {}
+                    }
+                  }
+                },
+                {
+                  "_id": "modal-refresh-library-button",
+                  "_type": "button",
+                  "_text": "Refresh Library",
+                  "_on": {
+                    "click": {
+                      "_module": "music-player-client",
+                      "_op": "list-tracks",
+                      "_params": {}
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "music-library-modal-status",
+              "_type": "label",
+              "_text": "Tracks not loaded.",
+              "class": "admin-panel-subtitle music-library-status",
+              "_data_source": "music-tracks-status",
+              "_on_data": {
+                "_op": "set-text-from-data"
+              }
+            },
+            {
+              "_id": "music-library-modal-error",
+              "_type": "label",
+              "_text": "No library errors.",
+              "class": "admin-panel-subtitle music-library-status",
+              "_data_source": "music-error",
+              "_on_data": {
+                "_op": "set-text-from-data"
+              }
+            },
+            {
+              "_id": "music-library-modal-table",
+              "_type": "table",
+              "class": "data-table music-tracks-table music-library-modal-table compact-library-table",
+              "_data_source": "music-tracks",
+              "_columns": [
+                {
+                  "_key": "_library_title",
+                  "_title": "Track"
+                },
+                {
+                  "_key": "_library_type_label",
+                  "_title": "Type"
+                },
+                {
+                  "_key": "_library_status_label",
+                  "_title": "Status"
+                },
+                {
+                  "_key": "actions",
+                  "_title": "Actions",
+                  "_type": "actions",
+                  "_actions": [
+                    {
+                      "_type": "button",
+                      "_text": "Add",
+                      "_variant": "primary",
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "add-track-to-playlist",
+                          "_params": {
+                            "_track_id": "$row._id"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              ],
+              "_striped": false,
+              "_hover": true,
+              "_bordered": false,
+              "_dense": true,
+              "_empty_text": "No tracks loaded."
+            }
+          ],
+          "_open": false,
+          "_size": "lg",
+          "_closable": true,
+          "_close_on_backdrop": true,
+          "_actions": [
+            {
+              "_type": "button",
+              "_text": "Close",
+              "_on": {
+                "click": {
+                  "_op": "close-object",
+                  "_params": {
+                    "_id": "music-library-modal"
+                  }
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

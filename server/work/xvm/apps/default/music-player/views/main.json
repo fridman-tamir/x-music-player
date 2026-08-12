@@ -1,0 +1,481 @@
+{
+  "_id": "main",
+  "_type": "view",
+  "_on": {
+    "mount": {
+      "_module": "music-player-client",
+      "_op": "init-player-view",
+      "_params": {}
+    }
+  },
+  "_children": [
+    {
+      "_id": "music-player-app",
+      "_type": "view",
+      "class": "app-ctx dash-app music-player-app",
+      "_children": [
+        {
+          "_id": "music-player-toolbar",
+          "_type": "view",
+          "class": "page-toolbar music-player-toolbar",
+          "_children": [
+            {
+              "_id": "music-player-toolbar-left",
+              "_type": "view",
+              "class": "page-toolbar__left",
+              "_children": [
+                {
+                  "_id": "label-1",
+                  "_type": "label",
+                  "_text": "Reut Music Player",
+                  "class": "page-title music-player-title"
+                },
+                {
+                  "_id": "label-2",
+                  "_type": "label",
+                  "_text": "ready",
+                  "class": "page-subtitle music-player-status",
+                  "_data_source": "music-player-status",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                }
+              ]
+            },
+            {
+              "_id": "music-player-toolbar-right",
+              "_type": "view",
+              "class": "page-toolbar__right",
+              "_children": [
+                {
+                  "_id": "admin-button",
+                  "_type": "button",
+                  "_text": "Admin ⚙︎",
+                  "class": "control-button admin-button",
+                  "_on": {
+                    "click": {
+                      "_module": "xvm",
+                      "_op": "navigate",
+                      "_params": {
+                        "_to": "admin",
+                        "_region": "main"
+                      }
+                    }
+                  }
+                },
+                {
+                  "_id": "xselect-1",
+                  "_type": "xselect",
+                  "class": "toolbar-theme-select",
+                  "_value": "terminal",
+                  "_options": [
+                    {
+                      "value": "terminal",
+                      "label": "Theme: Terminal"
+                    },
+                    {
+                      "value": "dark",
+                      "label": "Theme: Dark"
+                    },
+                    {
+                      "value": "light",
+                      "label": "Theme: Light"
+                    }
+                  ],
+                  "_on_change": {
+                    "_module": "xui",
+                    "_op": "apply-theme",
+                    "_params": {
+                      "_theme": "$data"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_id": "music-player-shell",
+          "_type": "view",
+          "class": "music-player-shell",
+          "_children": [
+            {
+              "_id": "music-now-playing-panel",
+              "_type": "view",
+              "class": "panel dash-card music-now-playing-panel",
+              "_children": [
+                {
+                  "_id": "label-3",
+                  "_type": "label",
+                  "_text": "Now Playing",
+                  "class": "small-label"
+                },
+                {
+                  "_id": "current-playlist",
+                  "_type": "label",
+                  "_text": "",
+                  "class": "playlist-title",
+                  "_data_source": "music-current-playlist-name",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "current-track",
+                  "_type": "label",
+                  "_text": "No track playing",
+                  "class": "track-title",
+                  "_data_source": "music-current-track-title",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "playback-status",
+                  "_type": "label",
+                  "_text": "ready",
+                  "class": "small-label music-player-status",
+                  "_data_source": "music-player-status",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "current-playlist-position",
+                  "_type": "label",
+                  "_text": "",
+                  "class": "small-label music-player-status",
+                  "_data_source": "music-current-playlist-position",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "playback-message",
+                  "_type": "label",
+                  "_text": "",
+                  "class": "small-label music-player-status",
+                  "_data_source": "music-playback-result-message",
+                  "_on_data": {
+                    "_op": "set-text-from-data"
+                  }
+                },
+                {
+                  "_id": "view-1",
+                  "_type": "view",
+                  "class": "progress-wrap",
+                  "_children": [
+                    {
+                      "_id": "label-4",
+                      "_type": "label",
+                      "_text": "0:00",
+                      "class": "time-label",
+                      "_data_source": "music-player-position-label",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    },
+                    {
+                      "_id": "view-2",
+                      "_type": "view",
+                      "class": "progress-line",
+                      "_children": [
+                        {
+                          "_id": "progress-fill",
+                          "_type": "view",
+                          "class": "progress-fill"
+                        }
+                      ]
+                    },
+                    {
+                      "_id": "label-5",
+                      "_type": "label",
+                      "_text": "0:00",
+                      "class": "time-label",
+                      "_data_source": "music-player-duration-label",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    },
+                    {
+                      "_id": "progress-percent-label",
+                      "_type": "label",
+                      "_text": "0%",
+                      "class": "time-label",
+                      "_data_source": "music-player-percent-label",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "view-4",
+                  "_type": "view",
+                  "class": "music-controls-row",
+                  "_children": [
+                    {
+                      "_id": "play-button",
+                      "_type": "button",
+                      "_text": "▶ Play",
+                      "class": "control-button music-control-button",
+                      "_visible": true,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "play-first-track",
+                          "_params": {}
+                        }
+                      }
+                    },
+                    {
+                      "_id": "previous-button",
+                      "_type": "button",
+                      "_text": "Previous",
+                      "class": "control-button music-control-button",
+                      "_visible": false,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "previous-track",
+                          "_params": {}
+                        }
+                      }
+                    },
+                    {
+                      "_id": "pause-button",
+                      "_type": "button",
+                      "_text": "⏸ Pause",
+                      "class": "control-button music-control-button",
+                      "_visible": false,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "pause-playback",
+                          "_params": {}
+                        }
+                      }
+                    },
+                    {
+                      "_id": "resume-button",
+                      "_type": "button",
+                      "_text": "▶ Resume",
+                      "class": "control-button music-control-button",
+                      "_visible": false,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "resume-playback",
+                          "_params": {}
+                        }
+                      }
+                    },
+                    {
+                      "_id": "next-button",
+                      "_type": "button",
+                      "_text": "Next",
+                      "class": "control-button music-control-button",
+                      "_visible": false,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "next-track",
+                          "_params": {}
+                        }
+                      }
+                    },
+                    {
+                      "_id": "stop-button",
+                      "_type": "button",
+                      "_text": "Stop Music",
+                      "class": "stop-button music-control-button",
+                      "_visible": false,
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "stop-playback",
+                          "_params": {}
+                        }
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "_id": "music-side-panels",
+              "_type": "view",
+              "class": "music-side-panels",
+              "_children": [
+                {
+                  "_id": "view-6",
+                  "_type": "view",
+                  "class": "panel dash-card music-volume-panel",
+                  "_children": [
+                    {
+                      "_id": "label-6",
+                      "_type": "label",
+                      "_text": "Volume",
+                      "class": "small-label"
+                    },
+                    {
+                      "_id": "view-7",
+                      "_type": "view",
+                      "class": "volume-row",
+                      "_children": [
+                        {
+                          "_id": "volume-down",
+                          "_type": "button",
+                          "_text": "-",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "set-volume",
+                              "_params": {
+                                "_delta": -5
+                              }
+                            }
+                          }
+                        },
+                        {
+                          "_id": "volume-label",
+                          "_type": "label",
+                          "_text": "45%",
+                          "class": "volume-label",
+                          "_data_source": "music-volume",
+                          "_on_data": {
+                            "_op": "set-text-from-data"
+                          }
+                        },
+                        {
+                          "_id": "volume-up",
+                          "_type": "button",
+                          "_text": "+",
+                          "_on": {
+                            "click": {
+                              "_module": "music-player-client",
+                              "_op": "set-volume",
+                              "_params": {
+                                "_delta": 5
+                              }
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "_id": "view-8",
+                  "_type": "view",
+                  "class": "panel dash-card music-playlist-panel",
+                  "_children": [
+                    {
+                      "_id": "label-7",
+                      "_type": "label",
+                      "_text": "Playlist",
+                      "class": "small-label"
+                    },
+                    {
+                      "_id": "playlist-select",
+                      "_type": "xselect",
+                      "_placeholder": "Select playlist",
+                      "class": "playlist-input",
+                      "_data_source": "music-playlist-options",
+                      "_value": "",
+                      "_selected_data_source": "music-selected-playlist-id",
+                      "_options": [],
+                      "_on_change": {
+                        "_module": "xd",
+                        "_op": "set",
+                        "_params": {
+                          "key": "music-selected-playlist-id",
+                          "value": "$data",
+                          "source": "main.playlist.select"
+                        }
+                      }
+                    },
+                    {
+                      "_id": "start-playlist-button",
+                      "_type": "button",
+                      "_text": "Start Playlist",
+                      "class": "full-button",
+                      "_on": {
+                        "click": {
+                          "_module": "music-player-client",
+                          "_op": "start-playlist",
+                          "_params": {}
+                        }
+                      }
+                    }
+                  ]
+                },
+                {
+                  "_id": "view-9",
+                  "_type": "view",
+                  "class": "panel dash-card music-schedule-panel",
+                  "_children": [
+                    {
+                      "_id": "label-8",
+                      "_type": "label",
+                      "_text": "Schedule",
+                      "class": "small-label"
+                    },
+                    {
+                      "_id": "label-9",
+                      "_type": "label",
+                      "_text": "Active now:",
+                      "class": "schedule-line"
+                    },
+                    {
+                      "_id": "active-schedule-runtime-label",
+                      "_type": "label",
+                      "_text": "-",
+                      "class": "schedule-line",
+                      "_data_source": "music-active-schedule-label",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    },
+                    {
+                      "_id": "label-10",
+                      "_type": "label",
+                      "_text": "Next:",
+                      "class": "schedule-line"
+                    },
+                    {
+                      "_id": "next-schedule-runtime-label",
+                      "_type": "label",
+                      "_text": "-",
+                      "class": "schedule-line",
+                      "_data_source": "music-next-schedule-label",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    },
+                    {
+                      "_id": "schedule-runtime-status-label",
+                      "_type": "label",
+                      "_text": "No active schedule",
+                      "class": "schedule-line",
+                      "_data_source": "music-schedule-runtime-status",
+                      "_on_data": {
+                        "_op": "set-text-from-data"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "_id": "label-11",
+          "_type": "label",
+          "_text": "Powered by Xpell AI",
+          "class": "powered-by"
+        }
+      ]
+    }
+  ]
+}

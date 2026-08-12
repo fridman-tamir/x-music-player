@@ -1,0 +1,24 @@
+{
+  "_id": "playlist",
+  "_title": "Playlist",
+  "_description": "Music player playlist.",
+  "_meta": {
+    "_version": 1
+  },
+  "_schema": {
+    "_name": {
+      "_type": "String",
+      "_required": true
+    },
+    "_description": {
+      "_type": "String"
+    },
+    "_mood": {
+      "_type": "String"
+    },
+    "_status": {
+      "_type": "String",
+      "_default": "active"
+    }
+  }
+}

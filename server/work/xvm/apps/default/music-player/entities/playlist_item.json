@@ -1,0 +1,26 @@
+{
+  "_id": "playlist_item",
+  "_title": "Playlist Item",
+  "_description": "Track entry inside a playlist.",
+  "_meta": {
+    "_version": 1
+  },
+  "_schema": {
+    "_playlist_id": {
+      "_type": "ObjectId",
+      "_required": true
+    },
+    "_track_id": {
+      "_type": "ObjectId",
+      "_required": true
+    },
+    "_order": {
+      "_type": "Number",
+      "_default": 0
+    },
+    "_enabled": {
+      "_type": "Boolean",
+      "_default": true
+    }
+  }
+}

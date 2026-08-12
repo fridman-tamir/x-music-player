@@ -1,0 +1,23 @@
+{
+  "_primary_artifact_type": "view",
+  "_artifact_types": [
+    "view"
+  ],
+  "_intent": {
+    "_action": "update",
+    "_target": "view",
+    "_forbidden_targets": [],
+    "_confidence": 0.85,
+    "_reason": "view_child_edit_intent"
+  },
+  "_reason": "resolved_view_scope_lock",
+  "_execution_plan": {
+    "_primary_artifact_type": "view",
+    "_artifacts": [
+      {
+        "_artifact_type": "view",
+        "_action": "update"
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_action": "update",
+  "_artifact_type": "view",
+  "_edit_action": "update",
+  "_explicit_artifact_type": true,
+  "_explicit_target_id": false,
+  "_module_ops": [],
+  "_source": "view_child_edit_intent",
+  "_confidence": 0.85,
+  "_warnings": []
+}

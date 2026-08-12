@@ -1,7 +1,7 @@
 import {
     _x,
     XModule,
-    type XCommand,
+    XCommand,
     XResponseOK,
     _xu,
     type XpellSkill,
@@ -410,6 +410,14 @@ export class MusicPlayer extends XModule {
         return xcmd?._params ?? {};
     }
 
+    private createInternalCommand(_op: string, _params: XCommand["_params"] = {}) {
+        return new XCommand({
+            _module: MusicPlayer._name,
+            _op,
+            _params
+        });
+    }
+
     private readRequiredString(params: any, field: string) {
         const value = params?.[field];
 
@@ -737,11 +745,11 @@ export class MusicPlayer extends XModule {
         });
 
         try {
-            const result = await this._next_track({
-                _params: {
+            const result = await this._next_track(
+                this.createInternalCommand("next-track", {
                     _auto_next: true
-                }
-            } as XCommand);
+                })
+            );
 
             if (this.isFailureResponse(result)) {
                 const result_data = this.readResponseResult(result);
@@ -1110,11 +1118,14 @@ export class MusicPlayer extends XModule {
             this.readRecordString(track, "_title") ||
             this.readRecordString(track, "_file_name") ||
             "Playing track";
-        const result = await this._play_track({
-            _params: track_id
-                ? { _track_id: track_id, _playlist_playback: playlist_playback }
-                : { _file_path: file_path, _playlist_playback: playlist_playback }
-        } as XCommand);
+        const result = await this._play_track(
+            this.createInternalCommand(
+                "play-track",
+                track_id
+                    ? { _track_id: track_id, _playlist_playback: playlist_playback }
+                    : { _file_path: file_path, _playlist_playback: playlist_playback }
+            )
+        );
         const result_data = this.readResponseResult(result);
 
         if (this.isFailureResponse(result)) {
@@ -1510,11 +1521,11 @@ export class MusicPlayer extends XModule {
                 const ended_schedule_id = this._active_schedule_id;
                 const ended_schedule_name = this._active_schedule_name;
 
-                await this._stop_playback({
-                    _params: {
+                await this._stop_playback(
+                    this.createInternalCommand("stop-playback", {
                         _preserve_schedule: true
-                    }
-                } as XCommand);
+                    })
+                );
                 this.clearActiveScheduleState();
 
                 _xlog.log("[music-player] schedule ended:", {
@@ -1550,11 +1561,11 @@ export class MusicPlayer extends XModule {
             const volume = Number(matching_schedule._volume);
 
             if (Number.isFinite(volume)) {
-                const volume_result = await this._set_volume({
-                    _params: {
+                const volume_result = await this._set_volume(
+                    this.createInternalCommand("set-volume", {
                         _volume: volume
-                    }
-                } as XCommand);
+                    })
+                );
 
                 if (this.isFailureResponse(volume_result)) {
                     const result_data = this.readResponseResult(volume_result);
@@ -1563,11 +1574,11 @@ export class MusicPlayer extends XModule {
             }
         }
 
-        const playlist_result = await this._start_playlist({
-            _params: {
+        const playlist_result = await this._start_playlist(
+            this.createInternalCommand("start-playlist", {
                 _playlist_id: playlist_id
-            }
-        } as XCommand);
+            })
+        );
 
         if (this.isFailureResponse(playlist_result)) {
             const result_data = this.readResponseResult(playlist_result);
@@ -2225,9 +2236,9 @@ export class MusicPlayer extends XModule {
 
             if (schedule_id === this._active_schedule_id) {
                 if (updates._enabled === false) {
-                    const stop_result = await this._stop_playback({
-                        _params: {}
-                    } as XCommand);
+                    const stop_result = await this._stop_playback(
+                        this.createInternalCommand("stop-playback")
+                    );
 
                     if (this.isFailureResponse(stop_result)) {
                         return stop_result;
@@ -2296,9 +2307,9 @@ export class MusicPlayer extends XModule {
             });
 
             if (!enabled_value && schedule_id === this._active_schedule_id) {
-                const stop_result = await this._stop_playback({
-                    _params: {}
-                } as XCommand);
+                const stop_result = await this._stop_playback(
+                    this.createInternalCommand("stop-playback")
+                );
 
                 if (this.isFailureResponse(stop_result)) {
                     return stop_result;

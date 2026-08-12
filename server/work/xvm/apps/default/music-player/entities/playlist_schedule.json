@@ -1,0 +1,48 @@
+{
+  "_id": "playlist_schedule",
+  "_title": "Playlist Schedule",
+  "_description": "Defines when a playlist should automatically run.",
+  "_meta": {
+    "_version": 1
+  },
+  "_schema": {
+    "_playlist_id": {
+      "_type": "ObjectId",
+      "_required": true
+    },
+    "_name": {
+      "_type": "String",
+      "_required": true
+    },
+    "_days": {
+      "_type": "Array",
+      "_description": "Array of weekday identifiers, for example [\"sun\", \"mon\", \"tue\", \"wed\", \"thu\"]."
+    },
+    "_start_time": {
+      "_type": "String",
+      "_required": true,
+      "_description": "Start time in HH:mm format, for example \"08:00\"."
+    },
+    "_end_time": {
+      "_type": "String",
+      "_required": true,
+      "_description": "End time in HH:mm format, for example \"12:00\"."
+    },
+    "_priority": {
+      "_type": "Number",
+      "_default": 0
+    },
+    "_enabled": {
+      "_type": "Boolean",
+      "_default": true
+    },
+    "_volume": {
+      "_type": "Number",
+      "_description": "Optional volume level. Expected later range: 0-100."
+    },
+    "_shuffle": {
+      "_type": "Boolean",
+      "_default": false
+    }
+  }
+}

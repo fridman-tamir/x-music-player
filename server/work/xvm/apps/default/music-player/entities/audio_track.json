@@ -1,0 +1,45 @@
+{
+  "_id": "audio_track",
+  "_title": "Audio Track",
+  "_description": "Scanned local audio track.",
+  "_meta": {
+    "_version": 1
+  },
+  "_schema": {
+    "_title": {
+      "_type": "String",
+      "_required": true
+    },
+    "_file_name": {
+      "_type": "String",
+      "_required": true
+    },
+    "_file_path": {
+      "_type": "String",
+      "_required": true,
+      "_unique": true,
+      "_index": {
+        "_unique": true
+      }
+    },
+    "_ext": {
+      "_type": "String"
+    },
+    "_status": {
+      "_type": "String",
+      "_default": "ready"
+    },
+    "_artist": {
+      "_type": "String"
+    },
+    "_album": {
+      "_type": "String"
+    },
+    "_duration_sec": {
+      "_type": "Number"
+    },
+    "_tags": {
+      "_type": "Array"
+    }
+  }
+}
