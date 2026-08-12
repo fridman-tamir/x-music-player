@@ -1,7 +1,13 @@
 FROM node:22-bookworm
 
 RUN apt-get update \
-    && apt-get install -y ffmpeg python3 python3-pip \
+    && apt-get install -y \
+       ffmpeg \
+       mpv \
+       python3 \
+       python3-pip \
+       make \
+       g++ \
     && pip3 install --break-system-packages yt-dlp \
     && rm -rf /var/lib/apt/lists/*
 RUN corepack enable
