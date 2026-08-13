@@ -256,7 +256,7 @@ const main = async () => {
         ? saved_app
         : "vibe-system";
 
-    const mode = resolveRuntimeMode(app_id);
+    const mode = "system"; //resolveRuntimeMode(app_id);
     (_x as any)._runtime_mode = mode;
     _xlog.log("[vibe-client] loading app", {
       _app_id: app_id,
